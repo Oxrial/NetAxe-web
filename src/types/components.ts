@@ -30,7 +30,9 @@ export interface TableSearchItem {
   onChange?: (value: any, associationItem: string) => void
   span?: number
 }
-
+export interface Operation {
+  render: () => VNode
+}
 export interface FormItem extends TableSearchItem {
   required?: boolean
   validator?: (value: FormItem, message: MessageApi) => boolean

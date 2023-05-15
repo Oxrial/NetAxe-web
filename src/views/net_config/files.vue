@@ -1,10 +1,7 @@
 <style scoped lang="scss">
-.operation-btn {
-  .n-button {
-    min-width: 80px;
-  }
-  .n-button + .n-button {
-    margin-left: 10px;
+.n-data-table {
+  :deep(.n-data-table__pagination) {
+    justify-content: flex-start;
   }
 }
 </style>
@@ -23,16 +20,6 @@
         preset="search"
         :options="filesSearchOptions"
       />
-      <span class="operation-btn">
-        <n-button size="small" type="success" @click="onResetSearch(), onSearch()">
-          <template #icon>
-            <n-icon>
-              <RestartAltTwotone />
-            </n-icon>
-          </template>
-          重置
-        </n-button>
-      </span>
       <n-data-table
         :loading="tableLoading"
         :data="dataList"
@@ -84,15 +71,15 @@
 </template>
 
 <script setup lang="ts">
-import { DataFormType, FormItem, ModalDialogType } from '@/types/components'
-import { DataTableColumn, NInput, NSelect, SelectOption, useMessage } from 'naive-ui'
+import { DataFormType, FormItem, Operation, ModalDialogType } from '@/types/components'
+import { DataTableColumn, NInput, NSelect, SelectOption, useMessage, NButton, NIcon, NSpace } from 'naive-ui'
 import { tablePrefix } from '@/utils'
 import { useTable, useTableColumn } from '@/hooks/table'
 import { useGet } from '@/hooks/useApi'
 import { get_net_filesList } from '@/api/url'
 import { RestartAltTwotone } from '@vicons/material'
 
-const filesSearchOptions: Array<FormItem> = [
+const filesSearchOptions: Array<FormItem | Operation> = [
   {
     key: 'column',
     label: '',
@@ -145,6 +132,23 @@ const filesSearchOptions: Array<FormItem> = [
         }
       })
     }
+  },
+  {
+    render: () =>
+      h(NSpace, {}, () => [
+        h(
+          NButton,
+          {
+            type: 'success',
+            size: 'small',
+            onClick: () => {
+              onResetSearch()
+              onSearch()
+            }
+          },
+          { icon: () => h(NIcon, {}, () => h(RestartAltTwotone)), default: () => h('span', '重置') }
+        )
+      ])
   }
 ]
 const get = useGet()

@@ -40,7 +40,7 @@ export function randomString(length: number) {
 export function toHump(str: string): string {
   if (!str) return str
   return str
-    .replace(/\-(\w)/g, function (all, letter) {
+    .replace(/-(\w)/g, function (all, letter) {
       return letter.toUpperCase()
     })
     .replace(/(\s|^)[a-z]/g, function (char) {
@@ -76,10 +76,7 @@ export function mapTwoLevelRouter(srcRoutes: Array<RouteRecordRaw>) {
   return []
 }
 
-export function transfromRoutes(
-  originRoutes: Array<RouteRecordRaw>,
-  parentPath = '/'
-): Array<RouteRecordRawWithHidden> | undefined {
+export function transfromRoutes(originRoutes: Array<RouteRecordRaw>, parentPath = '/'): Array<RouteRecordRawWithHidden> | undefined {
   if (!originRoutes) {
     return undefined
   }
@@ -88,7 +85,7 @@ export function transfromRoutes(
     const tempRoute = {
       ...it,
       hidden: (it as any).hidden ? !!(it as any).hidden : false,
-      fullPath: isExternal(it.path) ? it.path : path.resolve(parentPath, it.path),
+      fullPath: isExternal(it.path) ? it.path : path.resolve(parentPath, it.path)
     } as RouteRecordRawWithHidden
     if (tempRoute.children) {
       tempRoute.children = transfromRoutes(tempRoute.children, tempRoute.fullPath)
@@ -107,7 +104,7 @@ export function transfromMenu(originRoutes: Array<RouteRecordRawWithHidden>): Ar
           {
             href: item.path,
             target: '_blank',
-            rel: 'noopenner noreferrer',
+            rel: 'noopenner noreferrer'
           },
           (item.meta as any).title
         )
@@ -121,16 +118,16 @@ export function transfromMenu(originRoutes: Array<RouteRecordRawWithHidden>): Ar
   originRoutes
     .filter((it) => !it.hidden)
     .forEach((it) => {
-      const tempMenu = {
+      let tempMenu = {
         key: it.fullPath,
         label: getLabel(it),
-        icon: renderMenuIcon(
-          it.meta ? (it.meta.iconPrefix ? (it.meta.iconPrefix as string) : 'icon') : 'icon',
-          it.meta?.icon
-        ),
+        icon: renderMenuIcon(it.meta ? (it.meta.iconPrefix ? (it.meta.iconPrefix as string) : 'icon') : 'icon', it.meta?.icon)
       } as MenuOption
       if (it.children) {
         tempMenu.children = transfromMenu(it.children)
+      }
+      if (tempMenu.children && tempMenu.children.length === 1) {
+        tempMenu = tempMenu.children[0]
       }
       tempMenus.push(tempMenu)
     })
@@ -149,7 +146,7 @@ export function transformSplitTabMenu(routes?: Array<RouteRecordRawWithHidden>):
       iconPrefix: it.meta?.iconPrefix || 'icon',
       icon: it.meta ? (it.meta?.icon as any) : undefined,
       children: it.children,
-      checked: ref(false),
+      checked: ref(false)
     }
     tempTabs.push(splitTab)
   })
@@ -165,8 +162,8 @@ export function renderMenuIcon(iconPrefix: string, icon?: any) {
       default: () =>
         h(SvgIcon, {
           prefix: iconPrefix,
-          name: icon,
-        }),
+          name: icon
+        })
     })
 }
 
@@ -186,16 +183,12 @@ export function sortColumns(originColumns: DataTableColumn[], newColumns: TableP
   }
 }
 
-export function transformTreeSelect(
-  origin: any[],
-  labelName: string,
-  keyName: string
-): TreeSelectOption[] {
+export function transformTreeSelect(origin: any[], labelName: string, keyName: string): TreeSelectOption[] {
   const tempSelections: TreeSelectOption[] = []
   origin.forEach((it) => {
     const selection = {
       label: it[labelName],
-      key: it[keyName],
+      key: it[keyName]
     } as TreeSelectOption
     if (it.children) {
       selection.children = transformTreeSelect(it.children, labelName, keyName)
@@ -205,16 +198,12 @@ export function transformTreeSelect(
   return tempSelections
 }
 
-export function transformSelect(
-  origin: any[],
-  labelName: string,
-  valueName: string
-): SelectOption[] {
+export function transformSelect(origin: any[], labelName: string, valueName: string): SelectOption[] {
   const tempSelections: SelectOption[] = []
   origin.forEach((it) => {
     const selection = {
       label: it[labelName],
-      value: it[valueName],
+      value: it[valueName]
     } as SelectOption
     if (it.children) {
       selection.children = transformSelect(it.children, labelName, valueName)

@@ -430,9 +430,42 @@ export default [
                 children: null
               }
             ]
+          },
+          {
+            id: 20008,
+            parent: null,
+            icon: null,
+            sort: 8,
+            name: '网络设备管理',
+            is_link: false,
+            is_catalog: false,
+            web_path: '/net_equip',
+            component: null,
+            component_name: null,
+            cache: false,
+            visible: true,
+            menuPermission: [],
+            children: [
+              {
+                id: 20081,
+                parent: 20008,
+                icon: 'Youtube-fill',
+                sort: 1,
+                name: '网络设备管理',
+                is_link: false,
+                is_catalog: false,
+                web_path: '/net_equip/index',
+                component: null,
+                component_name: null,
+                cache: false,
+                visible: true,
+                menuPermission: [],
+                children: null
+              }
+            ]
           }
         ],
-        count: 7,
+        count: 8,
         page: 1,
         limit: 1
       }

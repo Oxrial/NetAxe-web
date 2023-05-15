@@ -1,15 +1,4 @@
 <style scoped lang="scss">
-.n-pagination {
-  margin-top: 10px;
-}
-.operation-btn {
-  .n-button {
-    min-width: 80px;
-  }
-  .n-button + .n-button {
-    margin-left: 10px;
-  }
-}
 .n-data-table {
   :deep(.n-data-table__pagination) {
     justify-content: flex-start;
@@ -29,7 +18,6 @@
         preset="search"
         :options="conditionItems"
       />
-      {{ checkedRowKeys }}
       <n-data-table
         :loading="tableLoading"
         :data="dataList"
@@ -162,16 +150,14 @@
 import { useGet } from '@/hooks/useApi'
 import { get_net_config_backupList } from '@/api/url'
 
-import { DataFormType, ModalDialogType, FormItem } from '@/types/components'
+import { DataFormType, ModalDialogType, FormItem, Operation } from '@/types/components'
 import { DataTableColumn, NInput, NSelect, SelectOption, useMessage, NButton, NIcon, NSpace, DataTableRowKey } from 'naive-ui'
 import { useTable } from '@/hooks/table'
 import { tablePrefix } from '@/utils'
 import { RestartAltTwotone, AddCircleOutlineRound, NotStartedOutlined, StopCircleOutlined } from '@vicons/material'
 
 const searchForm = ref<DataFormType | null>(null)
-interface Operation {
-  render: () => VNode
-}
+
 const conditionItems: Array<FormItem | Operation> = [
   {
     key: 'name',

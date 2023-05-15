@@ -85,7 +85,7 @@ function isMenu(path: string) {
 
 function getNameByUrl(path: string) {
   const temp = path.split('/')
-  return toHump(temp[temp.length - 1])
+  return toHump(temp[temp.length - 2]) + toHump(temp[temp.length - 1])
 }
 
 function generatorRoutes(res: Array<OriginRoute>, prePath = '') {
@@ -97,7 +97,7 @@ function generatorRoutes(res: Array<OriginRoute>, prePath = '') {
       const path = it.link_path && isExternal(it.link_path) ? it.link_path : truePath
       const route: RouteRecordRawWithHidden = {
         path: path,
-        name: getNameByUrl(path),
+        name: getNameByUrl(it.web_path),
         hidden: !!it.hidden,
         // 是否为根菜单，是为公共布局组件，否为局部组件
         component: it.web_path && isMenu(it.web_path) ? Layout : getComponent(it),
@@ -116,7 +116,6 @@ function generatorRoutes(res: Array<OriginRoute>, prePath = '') {
       tempRoutes.push(route)
     }
   })
-  
   return tempRoutes
 }
 
