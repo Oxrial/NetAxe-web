@@ -29,6 +29,8 @@ export const getperiodic_taskList = '/api/backend/periodic_task/'
 export const get_net_config_backupList = '/api/net_config/backuplist/'
 export const get_net_config_backupupdate = '/api/net_config/backupupdate/'
 export const get_net_equipList = '/api/net_config/equipList/'
+export const get_net_filesList = '/api/net_config/filesList/'
+export const get_net_confFilesList = '/api/net_config/confFilesList/'
 // 拓扑图
 export const get_topology = '/api/topology/index/'
 export const topology_show = '/api/topology/show/'

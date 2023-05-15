@@ -7,8 +7,8 @@
             <img :src="avatar" />
           </div>
           <div class="flex flex-col justify-around ml-3.5 flex-1">
-            <div class="text-lg">CMDB工作台</div>
-            <div class="text-sm text-gray-500">今日有小雨，出门别忘记带伞哦~ </div>
+            <div class="text-lg">{{ projectName }}工作台</div>
+            <div class="text-sm text-gray-500">今日有小雨，出门别忘记带伞哦~</div>
           </div>
         </n-grid-item>
         <n-grid-item class="flex justify-end" span="4 s:2 m:2 l:2 xl:2 2xl:2">
@@ -31,14 +31,12 @@
       <n-grid-item v-for="(item, index) of fastActions" :key="index">
         <n-card @click="fastActionClick(item)">
           <div class="flex flex-col items-center justify-center">
-            <span :class="[item.icon, 'iconfont']" :style="{ color: item.color, fontSize: '30px' }"></span>
+            <span :class="[item.icon, 'iconfont']" :style="{ color: item.color, fontSize: '30px' }" />
             <span class="mt-1">{{ item.title }}</span>
           </div>
         </n-card>
       </n-grid-item>
     </n-grid>
-
-
   </div>
 </template>
 
@@ -50,16 +48,16 @@ import { useRouter } from 'vue-router'
 import { random } from 'lodash'
 import { useLayoutStore } from '@/components'
 import useUserStore from '@/store/modules/user'
+import { projectName } from '@/setting'
 const COLORS = ['#67C23A', '#E6A23C', '#F56C6C', '#409EFF']
 const date = new Date()
 export default defineComponent({
   name: 'WorkPlace',
   components: {
     ProjectItem,
-    TodoItem,
+    TodoItem
   },
   setup() {
-   
     const layoutStore = useLayoutStore()
     const isMobileScreen = computed(() => {
       return layoutStore.state.device === 'mobile'
@@ -71,6 +69,7 @@ export default defineComponent({
       router.push(path)
     }
     return {
+      projectName,
       isMobileScreen,
       avatar,
       currentDate: date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate(),
@@ -79,19 +78,19 @@ export default defineComponent({
           title: '首页',
           icon: 'icon-dashboard-fill',
           path: '/',
-          color: COLORS[random(0, COLORS.length)],
+          color: COLORS[random(0, COLORS.length)]
         },
         {
           title: '网络设备',
           path: '/cmdb/network_device',
           icon: 'icon-windows-fill',
-          color: COLORS[random(0, COLORS.length)],
+          color: COLORS[random(0, COLORS.length)]
         },
         {
           title: '接口清单',
           path: '/cmdb/interfaceused',
           icon: 'icon-detail-fill',
-          color: COLORS[random(0, COLORS.length)],
+          color: COLORS[random(0, COLORS.length)]
         },
         // {
         //   title: '采集方案',
@@ -109,12 +108,12 @@ export default defineComponent({
           title: '更多功能',
           path: '/other/qrcode',
           icon: 'icon-appstore-fill',
-          color: COLORS[random(0, COLORS.length)],
-        },
+          color: COLORS[random(0, COLORS.length)]
+        }
       ],
-      fastActionClick,
+      fastActionClick
     }
-  },
+  }
 })
 </script>
 
@@ -127,7 +126,7 @@ export default defineComponent({
   min-width: 3rem;
   min-height: 3rem;
 
-  &>img {
+  & > img {
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -166,7 +165,7 @@ div.item-action:last-child::after {
   box-shadow: 0px 0px 10px #ddd;
 }
 
-.el-link+.el-link {
+.el-link + .el-link {
   margin-bottom: 10px;
 }
 </style>

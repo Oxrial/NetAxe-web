@@ -1,16 +1,16 @@
-import { NInput, DataTableColumn, useMessage, NIcon, NTag, TreeOption } from 'naive-ui'
+import { NInput, DataTableColumn, useMessage, NIcon, NTag, TreeOption, NSelect, SelectOption } from 'naive-ui'
 import { GlobeOutline, BusinessOutline, FileTrayStackedOutline } from '@vicons/ionicons5'
-import { ModalDialogType, FormItem } from '@/types/components'
+import { FormItem } from '@/types/components'
 import type { DataTableRowKey } from 'naive-ui'
 import { useTable, useTableColumn } from '@/hooks/table'
 import { useGet } from '@/hooks/useApi'
 import { get_net_equipList } from '@/api/url'
+import { arrClear } from '@/utils'
 
-export default function () {
-  let parentObject: any = {}
-  const useTriggerParent = (object: any) => (parentObject = object)
-
-  const modalDialogRef = ref<ModalDialogType | null>(null)
+export default function ({ itemDataFormRef, selectEquipModalDialogRef }: any) {
+  const modalDialogConfig = {
+    close: () => arrClear(checkedRowKeys.value)
+  }
   interface TreeConfig {
     data: TreeOption[]
     defaultExpandedKeys: Array<string>
@@ -55,17 +55,12 @@ export default function () {
       }
     })
   }
-  const doMounted = () => {
-    leafEOC(treeConfig.data)
-    onSearch()
-  }
-  const submitChecked: any[] = []
   const submitConfirm = () => {
-    submitChecked.splice(0, submitChecked.length)
-    submitChecked.push(...checkedRowKeys.value)
-    // modalDialogRef.value?.toggle()
-    parentObject.useSelectEquipModalDialogRef()?.value?.toggle()
-    // console.log('submitConfirm', modalDialogRef)
+    const selectEquipFormItem = itemDataFormRef?.value.options.find((iform: FormItem) => iform.key === 'selectEquip')
+    console.log(itemDataFormRef, selectEquipFormItem, selectEquipFormItem?.value)
+    // console.log(selectEquipModalDialogRef)
+    selectEquipFormItem!.value!.value = [...checkedRowKeys.value]
+    selectEquipModalDialogRef?.value?.toggle()
   }
   interface LeafIconEnums {
     [key: string]: any
@@ -77,19 +72,49 @@ export default function () {
 
   const equipSearchOptions: Array<FormItem> = [
     {
-      key: 'value',
+      key: 'column',
+      label: '',
+      value: ref(null),
+      style: {
+        minWidth: 'unset'
+      },
+      optionItems: [
+        {
+          label: '名称',
+          value: 'name'
+        },
+        {
+          label: 'IP地址',
+          value: 'ip'
+        }
+      ],
+      render: (formItem) => {
+        return h(NSelect, {
+          style: { width: '7.5rem' },
+          value: formItem.value.value,
+          clearable: true,
+          options: formItem.optionItems as Array<SelectOption>,
+          placeholder: '过滤条件',
+          onUpdateValue: (val) => {
+            formItem.value.value = val
+          }
+        })
+      }
+    },
+    {
+      key: 'filterValue',
       label: '',
       value: ref(''),
       render: (formItem) => {
         return h(NInput, {
           value: formItem.value.value,
-          placeholder: 'IP',
+          clearable: true,
           onUpdateValue: (val) => {
             formItem.value.value = val
           },
           onKeyup: (Event) => {
             if (Event.key == 'Enter') {
-              // parentObject.onSearch()
+              onSearch()
             }
           }
         })
@@ -97,8 +122,9 @@ export default function () {
     }
   ]
   const onResetSearch = () => {}
-  const onSearch = () => {
-    doRefresh()
+  const doMounted = () => {
+    leafEOC(treeConfig.data)
+    onSearch()
   }
   const get = useGet()
   const message = useMessage()
@@ -115,62 +141,10 @@ export default function () {
       table.handleSuccess(res)
     })
   }
+  const onSearch = () => {
+    doRefresh()
+  }
 
-  const table = useTable()
-  const tableColumns = reactive(
-    useTableColumn(
-      [
-        {
-          type: 'selection'
-        },
-        {
-          title: '状态',
-          width: 60,
-          key: 'state',
-          render: (row) => {
-            if (row.state === '1') {
-              return h(NTag, { type: 'success' }, () => h('span', {}, '在线'))
-            } else if (row.state === '0') {
-              return h(NTag, { type: 'error' }, () => h('span', {}, '离线'))
-            } else {
-              return h(NTag, () => h('span', {}, '未知'))
-            }
-          }
-        },
-        {
-          title: '名称',
-          key: 'name'
-        },
-        {
-          title: 'IP地址',
-          key: 'ip',
-          ellipsis: true,
-          width: 135
-        },
-        {
-          title: '类型',
-          key: 'type',
-          width: 80
-        },
-        {
-          title: 'FTP类型',
-          key: 'ftpType',
-          width: 80
-        },
-        {
-          title: '子网名称',
-          key: 'subNetName'
-        },
-        {
-          title: '描述',
-          key: 'description'
-        }
-      ],
-      {
-        align: 'center'
-      } as DataTableColumn
-    )
-  )
   type RowData = {
     state: string
     name: string
@@ -180,18 +154,69 @@ export default function () {
     subNetName: string
     description: string
   }
+  const table = useTable()
+  const tableColumns = useTableColumn(
+    [
+      {
+        type: 'selection'
+      },
+      {
+        title: '状态',
+        width: 60,
+        key: 'state',
+        render: (row) => {
+          if (row.state === '1') {
+            return h(NTag, { type: 'success' }, () => h('span', {}, '在线'))
+          } else if (row.state === '0') {
+            return h(NTag, { type: 'error' }, () => h('span', {}, '离线'))
+          } else {
+            return h(NTag, () => h('span', {}, '未知'))
+          }
+        }
+      },
+      {
+        title: '名称',
+        key: 'name'
+      },
+      {
+        title: 'IP地址',
+        key: 'ip',
+        ellipsis: true,
+        width: 135
+      },
+      {
+        title: '类型',
+        key: 'type',
+        width: 80
+      },
+      {
+        title: 'FTP类型',
+        key: 'ftpType',
+        width: 80
+      },
+      {
+        title: '子网名称',
+        key: 'subNetName'
+      },
+      {
+        title: '描述',
+        key: 'description'
+      }
+    ] as DataTableColumn[],
+    {
+      align: 'center'
+    } as DataTableColumn
+  )
   const rowKey = (row: RowData) => row.name
   const checkedRowKeys = ref<any[]>([])
   const updateCheckedRowKeys = (rowKeys: DataTableRowKey[]) => {
     checkedRowKeys.value = rowKeys
   }
-  const tablePaginationPrefix = () => h('span', {}, `共 ${table.dataList.length} 条`)
   const checkedPaginationPrefix = () =>
     h('span', { style: { 'text-align': 'left' } }, `已选择 ${table.dataList.filter((d) => checkedRowKeys.value.includes(d.name)).length} 条`)
   return {
-    modalDialogRef,
+    modalDialogConfig,
     submitConfirm,
-    useTriggerParent,
     equipSearchOptions,
     onSearch,
     onResetSearch,
@@ -199,11 +224,9 @@ export default function () {
     rowKey,
     ...table,
     tableColumns,
-    tablePaginationPrefix,
     checkedPaginationPrefix,
     checkedRowKeys,
     updateCheckedRowKeys,
-    doMounted,
-    submitChecked
+    doMounted
   }
 }

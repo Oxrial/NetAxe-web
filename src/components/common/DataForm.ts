@@ -67,10 +67,12 @@ export default defineComponent({
 
     function generatorParams() {
       if (!options.value) return
-      return options.value.reduce((pre: any, cur: FormItem) => {
-        pre[cur.key] = cur.value.value
-        return pre
-      }, {})
+      return options.value
+        .filter((o) => !!o.value)
+        .reduce((pre: any, cur: FormItem) => {
+          pre[cur.key] = cur.value.value
+          return pre
+        }, {})
     }
 
     function validator() {
@@ -186,6 +188,7 @@ export default defineComponent({
                   {
                     label: it.label,
                     path: it.path || (it.key as string),
+                    ...it.formItemConfig,
                     style: {
                       width: `calc(100% / ${this.formConfig.split || 2} - ${((this.formConfig.split || 2) - 1) * 20}px)`,
                       'margin-right': '20px',
@@ -204,6 +207,7 @@ export default defineComponent({
                   {
                     label: it.label,
                     path: it.path || (it.key as string),
+                    ...it.formItemConfig,
                     style: {
                       'min-width': `${220 + Number(this.formConfig.labelWidth)}px`,
                       'margin-right': '20px',
@@ -220,7 +224,8 @@ export default defineComponent({
                   NFormItem,
                   {
                     label: it.label,
-                    path: it.path || (it.key as string)
+                    path: it.path || (it.key as string),
+                    ...it.formItemConfig
                   },
                   {
                     default: renderItem(it)

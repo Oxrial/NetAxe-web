@@ -10,16 +10,20 @@
     :bordered="false"
     :style="bodyStyle"
     :segmented="segmented"
+    :on-after-leave="onAfterLeave"
     display-directive="show"
   >
     <div :style="{ height: contentHeight }">
       <slot name="content" />
     </div>
+    <template #header>
+      <slot name="header" />
+    </template>
     <template #footer>
-      <div class="flex justify-end">
+      <div v-show="footer" class="flex justify-end">
         <n-space>
-          <n-button type="default" size="small" @click="onCancel">取消</n-button>
-          <n-button type="primary" size="small" @click="onConfirm">确定</n-button>
+          <n-button v-show="cancel" type="default" size="small" @click="onCancel">{{ cancelText }}</n-button>
+          <n-button v-show="confirm" type="primary" size="small" @click="onConfirm">{{ confirmText }}</n-button>
         </n-space>
       </div>
     </template>
@@ -41,7 +45,31 @@ export default defineComponent({
     },
     contentHeight: {
       type: String,
-      default: '30vh'
+      default: '100%'
+    },
+    onAfterLeave: {
+      type: Function as PropType<() => void>,
+      default: () => {}
+    },
+    footer: {
+      type: Boolean,
+      default: true
+    },
+    confirm: {
+      type: Boolean,
+      default: true
+    },
+    cancel: {
+      type: Boolean,
+      default: true
+    },
+    confirmText: {
+      type: String,
+      default: '确定'
+    },
+    cancelText: {
+      type: String,
+      default: '取消'
     }
   },
   emits: ['confirm', 'cancel'],

@@ -14,53 +14,48 @@
         </n-text>
       </div>
       <AccountInfo v-if="activeStep === 1" @next-step="next" />
-      <PasswordInfo
-        v-if="activeStep === 2"
-        :account-info="accountInfo"
-        @next-step="activeStep++"
-        @pre-step="activeStep--"
-      />
+      <PasswordInfo v-if="activeStep === 2" :account-info="accountInfo" @next-step="activeStep++" @pre-step="activeStep--" />
       <ResultInfo v-if="activeStep === 3" :account-info="accountInfo" @pre-step="activeStep = 1" />
     </n-card>
   </div>
 </template>
 
 <script lang="ts">
-  import { defineComponent } from '@vue/runtime-core'
-  import AccountInfo from './components/AccountInfo.vue'
-  import PasswordInfo from './components/PasswordInfo.vue'
-  import ResultInfo from './components/ResultInfo.vue'
-  export default defineComponent({
-    name: 'StepForm',
-    components: { AccountInfo, PasswordInfo, ResultInfo },
-    data() {
-      return {
-        activeStep: 1,
-        accountInfo: {},
+import { defineComponent } from 'vue'
+import AccountInfo from './components/AccountInfo.vue'
+import PasswordInfo from './components/PasswordInfo.vue'
+import ResultInfo from './components/ResultInfo.vue'
+export default defineComponent({
+  name: 'StepForm',
+  components: { AccountInfo, PasswordInfo, ResultInfo },
+  data() {
+    return {
+      activeStep: 1,
+      accountInfo: {}
+    }
+  },
+  methods: {
+    next(accountInfo: any) {
+      if (this.activeStep === 1) {
+        this.accountInfo = accountInfo
+        this.activeStep += 1
       }
-    },
-    methods: {
-      next(accountInfo: any) {
-        if (this.activeStep === 1) {
-          this.accountInfo = accountInfo
-          this.activeStep += 1
-        }
-      },
-    },
-  })
+    }
+  }
+})
 </script>
 
 <style lang="scss" scoped>
-  @media screen and (max-width: 768px) {
-    .steps-wrapper {
-      width: 100%;
-      margin: 0 auto;
-    }
+@media screen and (max-width: 768px) {
+  .steps-wrapper {
+    width: 100%;
+    margin: 0 auto;
   }
-  @media screen and (min-width: 768px) {
-    .steps-wrapper {
-      width: 60%;
-      margin: 0 auto;
-    }
+}
+@media screen and (min-width: 768px) {
+  .steps-wrapper {
+    width: 60%;
+    margin: 0 auto;
   }
+}
 </style>

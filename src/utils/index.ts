@@ -1,7 +1,7 @@
 import { RouteRecordRaw } from 'vue-router'
 import path from 'path-browserify'
 import { SplitTab, RouteRecordRawWithHidden } from '../types/store'
-import { DataTableColumn, MenuOption, NIcon, TreeSelectOption, SelectOption } from 'naive-ui'
+import { DataTableColumn, MenuOption, NIcon, TreeSelectOption, SelectOption, PaginationInfo } from 'naive-ui'
 import { h, ref } from 'vue'
 import SvgIcon from '../components/svg-icon/index.vue'
 import { TablePropsType } from '@/types/components'
@@ -244,3 +244,6 @@ export function findRouteByUrl(routes: Array<any>, path: string): RouteRecordRaw
   }
   return null
 }
+
+export const tablePrefix = (info: PaginationInfo) => h('span', { style: { 'text-align': 'left' } }, `共 ${info.itemCount} 条`)
+export const arrClear = (arr: Array<any>) => arr.splice(0, arr.length)

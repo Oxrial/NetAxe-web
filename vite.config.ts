@@ -17,31 +17,32 @@ export default ({ mode }) => {
       vue(),
       viteSvgIcons({
         iconDirs: [path.resolve(process.cwd(), 'src/icons')],
-        symbolId: 'icon-[dir]-[name]',
+        symbolId: 'icon-[dir]-[name]'
       }),
       vitePluginCompression({
-        threshold: 1024 * 10,
+        threshold: 1024 * 10
       }),
       ViteComponents({
-        resolvers: [NaiveUiResolver()],
+        resolvers: [NaiveUiResolver()]
       }),
       vueJsx(),
       viteMockServe({
-        mockPath: 'mock',watchFiles: false
+        mockPath: 'mock',
+        watchFiles: false
       }),
       AutoImport({
         imports: 'vue',
-        dts: 'src/types/auto-import.d.ts',
+        dts: 'src/types/auto-import.d.ts'
       }),
-      setupExtend(),
+      setupExtend()
     ],
     resolve: {
       alias: [
         {
           find: '@/',
-          replacement: path.resolve(process.cwd(), 'src') + '/',
-        },
-      ],
+          replacement: path.resolve(process.cwd(), 'src') + '/'
+        }
+      ]
     },
     server: {
       open: true,
@@ -54,47 +55,47 @@ export default ({ mode }) => {
           target: env.VITE_BASIC_URL,
           // ws: true, //代理websockets
           changeOrigin: true, // 虚拟的站点需要更管origin
-          rewrite: (path: string) => path.replace(/^\/api/, '/api'),
+          rewrite: (path: string) => path.replace(/^\/api/, '/api')
         },
         '/rbac': {
           target: env.VITE_BASIC_RBAC,
           // ws: true, //代理websockets
           changeOrigin: true, // 虚拟的站点需要更管origin
-          rewrite: (path: string) => path.replace(/^\/rbac/, '/rbac'),
+          rewrite: (path: string) => path.replace(/^\/rbac/, '/rbac')
         },
         '/ipam': {
           target: env.VITE_BASIC_URL,
           // ws: true, //代理websockets
           changeOrigin: true, // 虚拟的站点需要更管origin
-          rewrite: (path: string) => path.replace(/^\/ipam/, '/ipam'),
+          rewrite: (path: string) => path.replace(/^\/ipam/, '/ipam')
         },
         '/media': {
           target: env.VITE_BASIC_URL,
           // ws: true, //代理websockets
           changeOrigin: true, // 虚拟的站点需要更管origin
-          rewrite: (path: string) => path.replace(/^\/media/, '/media'),
+          rewrite: (path: string) => path.replace(/^\/media/, '/media')
         },
         '/ws': {
           target: env.VITE_BASIC_URL,
           timeout: 60000,
           ws: true, //代理websockets
           changeOrigin: true, // 虚拟的站点需要更管origin
-          rewrite: (path: string) => path.replace(/^\/ws/, '/ws'),
-        },
-      },
-    },
+          rewrite: (path: string) => path.replace(/^\/ws/, '/ws')
+        }
+      }
+    }
   }
   if (mode === 'staging') {
     return Object.assign(
       {
-        base: '/admin-work/',
+        base: '/admin-work/'
       },
       config
     )
   } else {
     return Object.assign(
       {
-        base: '/',
+        base: '/'
       },
       config
     )

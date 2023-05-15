@@ -1,6 +1,6 @@
 <template>
   <n-config-provider :theme-overrides="state.themeOverrides" :theme="state.theme === 'dark' ? darkTheme : null" :locale="zhCN" style="height: 100%">
-    <n-global-style />
+    <!-- <n-global-style /> -->
     <n-loading-bar-provider>
       <n-dialog-provider>
         <n-el class="vaw-layout-container" :class="[state.device === 'mobile' && 'is-mobile', state.theme]">

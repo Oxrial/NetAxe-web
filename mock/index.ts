@@ -4,10 +4,11 @@ import Mock from 'mockjs'
 const data = Mock.mock({
   'backuplist|100': [
     {
+      'id|+1': 1,
       name: 'task_@integer(1,3)',
       'state|1': ['0', '1'],
       time: '@integer(1,50)',
-      backtime: '@datetime',
+      backuptime: '@datetime',
       'backresult|1': [0, 1]
     }
   ],
@@ -19,7 +20,23 @@ const data = Mock.mock({
       'type|1': ['1', '2', '3'],
       'ftpType|1': ['1', '2', '3'],
       subNetName: '@string(3, 6)',
-      description: 'DESCRIPTION'
+      description: '@cparagraph(1,1,5)'
+    }
+  ],
+  'filesList|100': [
+    {
+      name: 'EQUIP_@increment',
+      ip: '@IP',
+      'center|1': ['1', '2', '3'],
+      code: 'EQUIP@increment',
+      'type|1': ['1', '2', '3'],
+      backuptime: '@datetime'
+    }
+  ],
+  'confFilesList|100': [
+    {
+      fileName: 'file_@increment',
+      backuptime: '@datetime'
     }
   ]
 })
@@ -54,6 +71,28 @@ export default [
         code: 200,
         msg: '获取成功',
         results: data.equipList
+      }
+    }
+  },
+  {
+    url: '/api/net_config/filesList/',
+    method: 'get',
+    response: () => {
+      return {
+        code: 200,
+        msg: '获取成功',
+        results: data.filesList
+      }
+    }
+  },
+  {
+    url: '/api/net_config/confFilesList/',
+    method: 'get',
+    response: () => {
+      return {
+        code: 200,
+        msg: '获取成功',
+        results: data.confFilesList
       }
     }
   },

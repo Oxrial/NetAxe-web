@@ -114,7 +114,7 @@ export const useRowKey = function (propName: string) {
   }
 }
 
-export const useTableColumn = function (columns: DataTableColumn[], options: DataTableColumn) {
+export const useTableColumn = (columns: DataTableColumn[], options: DataTableColumn) => {
   return columns.map((it) => Object.assign(it, options))
 }
 

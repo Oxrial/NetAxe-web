@@ -31,8 +31,8 @@ export default Object.assign(
       isShowSearch: true,
       isShowMessage: true,
       isShowRefresh: true,
-      isShowFullScreen: true,
-    },
+      isShowFullScreen: true
+    }
   },
-  settingInfo,
+  settingInfo
 ) as Setting

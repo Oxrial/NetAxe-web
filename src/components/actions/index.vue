@@ -5,7 +5,7 @@
         <SearchIcon />
       </n-icon>
     </span>
-    <n-popover placement="bottom" trigger="click" :width="300">
+    <n-popover v-if="state.actionItem.showMessage" placement="bottom" trigger="click" :width="300">
       <template #trigger>
         <n-badge v-if="state.actionItem.showMessage" :value="badgeValue" class="badge-action-item">
           <n-icon size="18">

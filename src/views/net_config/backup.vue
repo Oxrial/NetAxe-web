@@ -1,168 +1,21 @@
-<script setup lang="ts" name="Backup">
-import { useGet } from '@/hooks/useApi'
-import { get_net_config_backupList } from '@/api/url'
-
-import { DataFormType, ModalDialogType, FormItem } from '@/types/components'
-import { DataTableColumn, NInput, NSelect, SelectOption, useMessage, NButton } from 'naive-ui'
-import { useTable, useTableColumn } from '@/hooks/table'
-
-const searchForm = ref<DataFormType | null>(null)
-const conditionItems: Array<FormItem> = [
-  {
-    key: 'name',
-    label: '任务名称',
-    value: ref(''),
-    render: (formItem) => {
-      return h(NInput, {
-        value: formItem.value.value,
-        onUpdateValue: (val) => {
-          formItem.value.value = val
-        },
-        onKeyup: (Event) => {
-          if (Event.key == 'Enter') {
-            onSearch()
-          }
-        },
-        placeholder: ''
-      })
-    }
-  },
-
-  {
-    key: 'state',
-    label: '状态',
-    value: ref(''),
-    optionItems: [
-      { value: '1', label: '开启' },
-      { value: '0', label: '关闭' }
-    ],
-    render: (formItem) => {
-      return h(NSelect, {
-        options: formItem.optionItems as Array<SelectOption>,
-        value: formItem.value.value,
-        placeholder: '',
-        onUpdateValue: (val) => {
-          formItem.value.value = val
-          onSearch()
-        }
-      })
-    }
+<style scoped lang="scss">
+.n-pagination {
+  margin-top: 10px;
+}
+.operation-btn {
+  .n-button {
+    min-width: 80px;
   }
-]
-let request_url = ''
-
-const onResetSearch = () => {
-  searchForm.value?.reset()
-}
-const onSearch = () => {
-  const search_form = searchForm.value?.generatorParams()
-  request_url = get_net_config_backupList + '?name=' + search_form.name + '&task=' + search_form.state
-  doRefresh()
-}
-
-const get = useGet()
-const message = useMessage()
-const table = useTable()
-const { tableLoading, dataList } = table
-
-const doRefresh = () => {
-  get({
-    url: request_url,
-    data: () => {
-      return {
-        _: Date.now()
-      }
-    }
-  }).then((res) => {
-    message.success(res.msg)
-    table.handleSuccess(res)
-  })
-}
-
-const tablePagination = reactive({
-  page: 1,
-  pageSize: 10,
-  showSizePicker: true,
-  pageSizes: [10, 30, 50],
-  onChange: (page: number) => {
-    tablePagination.page = page
-  },
-  onUpdatePageSize: (pageSize: number) => {
-    tablePagination.pageSize = pageSize
-    tablePagination.page = 1
+  .n-button + .n-button {
+    margin-left: 10px;
   }
-})
-const rowKey = (rowData: any) => {
-  return rowData.id
 }
-const tableColumns = reactive(
-  useTableColumn(
-    [
-      {
-        title: '任务名称',
-        key: 'name'
-      },
-      {
-        title: '状态',
-        key: 'state',
-        render: (rowData) => {
-          if (rowData.state === '0') {
-            return h(NButton, { type: 'error', size: 'tiny' }, () => h('span', {}, '关闭'))
-          } else {
-            return h(NButton, { type: 'primary', size: 'tiny' }, () => h('span', {}, '开启'))
-          }
-        }
-      },
-      {
-        title: '执行周期',
-        key: 'time'
-        // render: (rowData) => {
-        //   if (!rowData.expires) {
-        //     return '永不过期'
-        //   }
-        // },
-      },
-      {
-        title: '最新备份时间',
-        key: 'backtime'
-      },
-      {
-        title: '最新备份结果',
-        key: 'backresult',
-        render: (rowData) => {
-          if (rowData.backresult) {
-            return h(NButton, { type: 'error', size: 'tiny' }, () => h('span', {}, '失败'))
-          } else {
-            return h(NButton, { type: 'primary', size: 'tiny' }, () => h('span', {}, '成功'))
-          }
-        }
-      }
-    ],
-    {
-      align: 'center'
-    } as DataTableColumn
-  )
-)
-
-onMounted(() => {
-  onSearch()
-  // itemDataForm.modalDialogRef.value = backupModalDialogRef.value
-  // itemDataForm.selectEquip.modalDialogRef.value = selectEquipModalDialogRef.value
-  // itemDataForm.itemDataFormRef.value = itemDataFormRef.value
-})
-import useItemDataForm from './hooks/useItemDataForm'
-const itemDataForm = useItemDataForm()
-const { selectEquip } = itemDataForm
-const backupModalDialogRef = ref<ModalDialogType | null>(null)
-const selectEquipModalDialogRef = ref<ModalDialogType | null>(null)
-const itemDataFormRef = ref<DataFormType | null>(null)
-itemDataForm.useTriggerParent({
-  useDoRefresh: () => doRefresh,
-  useBackupModalDialogRef: () => computed(() => backupModalDialogRef.value),
-  useSelectEquipModalDialogRef: () => computed(() => selectEquipModalDialogRef.value),
-  useItemDataFormRef: () => computed(() => itemDataFormRef.value)
-})
-</script>
+.n-data-table {
+  :deep(.n-data-table__pagination) {
+    justify-content: flex-start;
+  }
+}
+</style>
 
 <template>
   <div class="main-container">
@@ -176,18 +29,16 @@ itemDataForm.useTriggerParent({
         preset="search"
         :options="conditionItems"
       />
-      <span class="operation-btn">
-        <n-button size="small" type="info" @click="onSearch()">查询</n-button>
-        <n-button size="small" type="success" @click="onResetSearch(), onSearch()">重置</n-button>
-        <n-button type="primary" @click="backupModalDialogRef?.toggle" size="small">新建</n-button>
-      </span>
+      {{ checkedRowKeys }}
       <n-data-table
         :loading="tableLoading"
         :data="dataList"
         :columns="tableColumns"
         :pagination="tablePagination"
-        style="height: calc(100vh - 23rem)"
+        style="height: calc(100vh - 16rem)"
         :row-key="rowKey"
+        v-model:checked-row-keys="checkedRowKeys"
+        @update:checked-row-keys="updateCheckedRowKeys"
         flex-height
       />
     </n-card>
@@ -195,7 +46,8 @@ itemDataForm.useTriggerParent({
       ref="backupModalDialogRef"
       :title="itemDataForm.modalDialogConfig.title + '备份任务'"
       @confirm="itemDataForm.submitConfirm"
-      :style="{ height: '70vh', width: '55%', 'margin-top': '5vh' }"
+      :style="{ height: '82vh', width: '76%', 'margin-top': '5vh' }"
+      :on-after-leave="itemDataForm.modalDialogConfig.close"
     >
       <template #content>
         <DataForm
@@ -207,6 +59,22 @@ itemDataForm.useTriggerParent({
             labelAlign: 'left'
           }"
         />
+        <n-data-table
+          :data="itemDataForm.checkedDataList()"
+          :columns="selectEquip.tableColumns"
+          :pagination="{
+            prefix: tablePrefix,
+            pageSize: 10,
+            showSizePicker: true,
+            pageSizes: [10, 30, 50]
+          }"
+          size="small"
+          style="height: calc(100% - 12rem); width: 80%; margin: 0 auto"
+          :row-key="selectEquip.rowKey"
+          v-model:checked-row-keys="itemDataForm.checkedSelectEquipRowKeys.value"
+          @update:checked-row-keys="itemDataForm.updateCheckedSelectEquipRowKeys"
+          flex-height
+        />
       </template>
     </ModalDialog>
     <ModalDialog
@@ -215,6 +83,7 @@ itemDataForm.useTriggerParent({
       contentHeight="100%"
       @confirm="selectEquip.submitConfirm"
       :style="{ height: '80vh', width: '75%', 'margin-top': '6vh' }"
+      :on-after-leave="selectEquip.modalDialogConfig.close"
     >
       <template #content>
         <n-grid x-gap="20" cols="4" style="height: 100%">
@@ -231,24 +100,29 @@ itemDataForm.useTriggerParent({
           <n-grid-item span="3">
             <n-card style="height: 100%">
               <DataForm
-                ref="equipSearchForm"
+                ref="equipSearchFormRef"
                 :form-config="{
                   labelWidth: 80,
-                  size: 'medium'
+                  size: 'small',
+                  style: {
+                    display: 'flex'
+                  }
                 }"
                 preset="search"
                 :options="selectEquip.equipSearchOptions"
               />
-              <span class="operation-btn">
-                <n-button size="small" type="info" @click="selectEquip.onSearch()">查询</n-button>
-                <n-button size="small" type="success" @click="selectEquip.onResetSearch(), selectEquip.onSearch()">重置</n-button>
-              </span>
               <n-data-table
                 :loading="selectEquip.tableLoading.value"
-                :data="selectEquip.dataList"
+                :data="
+                  equipSearchFormRef?.generatorParams()?.column && equipSearchFormRef?.generatorParams()?.filterValue
+                    ? selectEquip.dataList.filter(
+                        (d) => d[equipSearchFormRef?.generatorParams()?.column]?.indexOf(equipSearchFormRef?.generatorParams()?.filterValue) > 0
+                      )
+                    : selectEquip.dataList
+                "
                 :columns="selectEquip.tableColumns"
                 :pagination="{
-                  prefix: () => selectEquip.tablePaginationPrefix(),
+                  prefix: tablePrefix,
                   pageSize: 10,
                   showSizePicker: true,
                   pageSizes: [10, 30, 50]
@@ -284,21 +158,225 @@ itemDataForm.useTriggerParent({
   </div>
 </template>
 
-<style scoped lang="scss">
-.n-pagination {
-  margin-top: 10px;
+<script setup lang="ts" name="Backup">
+import { useGet } from '@/hooks/useApi'
+import { get_net_config_backupList } from '@/api/url'
+
+import { DataFormType, ModalDialogType, FormItem } from '@/types/components'
+import { DataTableColumn, NInput, NSelect, SelectOption, useMessage, NButton, NIcon, NSpace, DataTableRowKey } from 'naive-ui'
+import { useTable } from '@/hooks/table'
+import { tablePrefix } from '@/utils'
+import { RestartAltTwotone, AddCircleOutlineRound, NotStartedOutlined, StopCircleOutlined } from '@vicons/material'
+
+const searchForm = ref<DataFormType | null>(null)
+interface Operation {
+  render: () => VNode
 }
-.operation-btn {
-  .n-button {
-    min-width: 80px;
+const conditionItems: Array<FormItem | Operation> = [
+  {
+    key: 'name',
+    label: '任务名称',
+    value: ref(''),
+    render: (formItem) => {
+      return h(NInput, {
+        value: formItem.value.value,
+        onUpdateValue: (val) => {
+          formItem.value.value = val
+        },
+        onKeyup: (Event) => {
+          if (Event.key == 'Enter') {
+            onSearch()
+          }
+        }
+      })
+    }
+  },
+
+  {
+    key: 'state',
+    label: '状态',
+    value: ref(null),
+    optionItems: [
+      { value: '1', label: '开启' },
+      { value: '0', label: '关闭' }
+    ],
+    render: (formItem) => {
+      return h(NSelect, {
+        options: formItem.optionItems as Array<SelectOption>,
+        value: formItem.value.value,
+        clearable: true,
+        onUpdateValue: (val) => {
+          formItem.value.value = val
+          onSearch()
+        }
+      })
+    }
+  },
+  {
+    render: () =>
+      h(NSpace, {}, () => [
+        h(
+          NButton,
+          {
+            type: 'success',
+            size: 'small',
+            onClick: () => {
+              onResetSearch()
+              onSearch()
+            }
+          },
+          { icon: () => h(NIcon, {}, () => h(RestartAltTwotone)), default: () => h('span', '重置') }
+        ),
+        h(
+          NButton,
+          {
+            type: 'info',
+            size: 'small',
+            onClick: () => {
+              backupModalDialogRef.value?.toggle()
+            }
+          },
+          { icon: () => h(NIcon, {}, () => h(AddCircleOutlineRound)), default: () => h('span', '新建') }
+        ),
+        h(
+          NButton,
+          {
+            type: 'info',
+            size: 'small',
+            onClick: () => {
+              console.log('start', checkedRowKeys.value)
+            }
+          },
+          { icon: () => h(NIcon, {}, () => h(NotStartedOutlined)), default: () => h('span', '启用') }
+        ),
+        h(
+          NButton,
+          {
+            type: 'error',
+            size: 'small',
+            onClick: () => {
+              console.log('stop', checkedRowKeys.value)
+            }
+          },
+          { icon: () => h(NIcon, {}, () => h(StopCircleOutlined)), default: () => h('span', '禁用') }
+        )
+      ])
   }
-  .n-button + .n-button {
-    margin-left: 10px;
-  }
+]
+let request_url = ''
+
+const onResetSearch = () => {
+  searchForm.value?.reset()
 }
-.n-data-table {
-  :deep(.n-data-table__pagination) {
-    justify-content: flex-start;
-  }
+const onSearch = () => {
+  const search_form = searchForm.value?.generatorParams()
+  request_url = get_net_config_backupList + '?name=' + search_form.name + '&task=' + search_form.state
+  doRefresh()
 }
-</style>
+
+const get = useGet()
+const message = useMessage()
+
+const table = useTable()
+const { tableLoading, dataList } = table
+
+const doRefresh = () => {
+  get({
+    url: request_url,
+    data: () => {
+      return {
+        _: Date.now()
+      }
+    }
+  }).then((res) => {
+    message.success(res.msg)
+    table.handleSuccess(res)
+  })
+}
+
+const tablePagination = reactive({
+  prefix: tablePrefix,
+  page: 1,
+  pageSize: 10,
+  showSizePicker: true,
+  pageSizes: [10, 30, 50],
+  onChange: (page: number) => {
+    tablePagination.page = page
+  },
+  onUpdatePageSize: (pageSize: number) => {
+    tablePagination.pageSize = pageSize
+    tablePagination.page = 1
+  }
+})
+interface RowData {
+  id: string | number
+  name: string
+  state: string
+  time: string
+  backuptime: string
+  backresult: string
+}
+const rowKey = (row: RowData) => {
+  return row.id
+}
+const tableColumns: DataTableColumn[] = [
+  {
+    type: 'selection'
+  },
+  {
+    title: '任务名称',
+    key: 'name'
+  },
+  {
+    title: '状态',
+    key: 'state',
+    render: (row: RowData) => {
+      if (row.state === '0') {
+        return h(NButton, { type: 'error', size: 'tiny' }, () => h('span', {}, '关闭'))
+      } else {
+        return h(NButton, { type: 'primary', size: 'tiny' }, () => h('span', {}, '开启'))
+      }
+    }
+  },
+  {
+    title: '执行周期',
+    key: 'time'
+    // render: (rowData) => {
+    //   if (!rowData.expires) {
+    //     return '永不过期'
+    //   }
+    // },
+  },
+  {
+    title: '最新备份时间',
+    key: 'backuptime'
+  },
+  {
+    title: '最新备份结果',
+    key: 'backresult',
+    render: (row: RowData) => {
+      if (row.backresult) {
+        return h(NButton, { type: 'error', size: 'tiny' }, () => h('span', {}, '失败'))
+      } else {
+        return h(NButton, { type: 'primary', size: 'tiny' }, () => h('span', {}, '成功'))
+      }
+    }
+  }
+] as DataTableColumn[]
+
+const checkedRowKeys = ref<any[]>([])
+const updateCheckedRowKeys = (rowKeys: DataTableRowKey[]) => {
+  checkedRowKeys.value = rowKeys
+}
+
+import useItemDataForm from './hooks/backup/useItemDataForm'
+const backupModalDialogRef = ref<ModalDialogType | null>(null)
+const itemDataFormRef = ref<DataFormType | null>(null)
+const selectEquipModalDialogRef = ref<ModalDialogType | null>(null)
+const equipSearchFormRef = ref<DataFormType | null>(null)
+const itemDataForm = useItemDataForm({ doRefresh, backupModalDialogRef, itemDataFormRef, selectEquipModalDialogRef, equipSearchFormRef })
+const { selectEquip } = itemDataForm
+onMounted(() => {
+  onSearch()
+})
+</script>
