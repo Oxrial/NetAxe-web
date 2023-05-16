@@ -1,18 +1,21 @@
-import { get_net_config_backupupdate } from '@/api/url'
+import { get_net_config_equipupdate } from '@/api/url'
 import { FormItem, CommItem } from '@/types/components'
-import { useMessage } from 'naive-ui'
+import { useMessage, NSelect } from 'naive-ui'
 import { usePost } from '@/hooks/useApi'
 import type { DataTableRowKey } from 'naive-ui'
+import type { FormRules } from 'naive-ui'
+import { useLoadCommon } from '@/components/common/DataForm'
+import _v from 'validator'
 
-export default function ({ doRefresh, itemModalDialogRef, itemDataFormRef }: any) {
+export default function ({ doRefresh, modalDialogRef, dataFormRef }: any) {
   const modalDialogConfig = {
     title: '新建',
     close: () => {
-      itemDataFormRef?.value?.reset()
+      dataFormRef?.value?.reset()
     }
   }
 
-  const itemFormOptions = [
+  const formOptions = useLoadCommon([
     {
       key: 'name',
       label: '设备名称',
@@ -24,6 +27,11 @@ export default function ({ doRefresh, itemModalDialogRef, itemDataFormRef }: any
       ftype: 'common'
     },
     {
+      key: 'center',
+      label: '所属中心',
+      ftype: 'common'
+    },
+    {
       key: 'code',
       label: '设备型号',
       ftype: 'common'
@@ -31,7 +39,8 @@ export default function ({ doRefresh, itemModalDialogRef, itemDataFormRef }: any
     {
       key: 'type',
       label: '设备类型',
-      ftype: 'common'
+      ftype: 'common',
+      type: NSelect
     },
     {
       key: 'version',
@@ -48,19 +57,31 @@ export default function ({ doRefresh, itemModalDialogRef, itemDataFormRef }: any
       label: '带内管理IP',
       ftype: 'common'
     }
-  ] as Array<FormItem | CommItem>
+  ] as Array<CommItem>) as Array<FormItem>
+  const rules = {
+    name: {
+      required: true,
+      message: '请输入姓名',
+      trigger: 'blur'
+    },
+    ip: {
+      validator: _v.isIP,
+      message: 'IP地址格式有误',
+      trigger: 'blur'
+    }
+  } as FormRules
   const post = usePost()
   const message = useMessage()
 
   const submitConfirm = () => {
-    const edit_info = itemDataFormRef?.value?.generatorParams()
+    const edit_info = dataFormRef?.value?.generatorParams()
     post({
-      url: get_net_config_backupupdate,
+      url: get_net_config_equipupdate,
       data: edit_info
     }).then((res) => {
-      // if(res.code===201){
+      // if(res.code===201){opolp
       message.success(res.msg)
-      itemModalDialogRef?.value?.toggle()
+      modalDialogRef?.value?.toggle()
       doRefresh()
       // }
     })
@@ -72,7 +93,8 @@ export default function ({ doRefresh, itemModalDialogRef, itemDataFormRef }: any
   }
   return {
     modalDialogConfig,
-    itemFormOptions,
+    formOptions,
+    rules,
     submitConfirm,
     checkedRowKeys,
     updateCheckedRowKeys

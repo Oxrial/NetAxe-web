@@ -51,7 +51,9 @@ export interface CommItem {
   key: string | number
   label: string
   type?: any
-  ftype?: 'common'
+  ftype: 'common'
+  required?: boolean
+  palceholder?: string
   attrs?: object
 }
 export interface LikeSearchModel {

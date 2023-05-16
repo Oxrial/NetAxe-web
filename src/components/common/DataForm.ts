@@ -1,20 +1,47 @@
 import { FormItem, CommItem } from './../../types/components'
-import { FormProps, NForm, NInput, NFormItem, NFormItemGridItem, NGrid, useMessage } from 'naive-ui'
+import { NInput, FormProps, NForm, NFormItem, NFormItemGridItem, NGrid, useMessage } from 'naive-ui'
+import type { FormRules } from 'naive-ui'
 // import service from '@/api/axios.config'
 
+export const renderCommon = (o: CommItem) => {
+  return {
+    key: o.key,
+    label: o.label,
+    value: ref(null),
+    required: o.required || false,
+    render: (formItem: FormItem) => {
+      !o.type && (o.type = NInput)
+      const placeholder = o.type !== NInput ? o.palceholder || null : '请输入' + o.label
+      return h(o.type, {
+        value: formItem.value.value,
+        clearable: true,
+        onUpdateValue: (val: any) => {
+          formItem.value.value = val
+        },
+        placeholder,
+        ...o.attrs
+      })
+    }
+  }
+}
+export const useLoadCommon = (tempOptions: CommItem[]) => {
+  const formOptions: Array<FormItem> = []
+  tempOptions.forEach((o) => o.ftype === 'common' && formOptions.push(renderCommon(o) as FormItem))
+  return formOptions
+}
 function renderItem(formItem: FormItem) {
   return function () {
     if (formItem.render) {
       return formItem.required
         ? [
-            formItem.render(formItem),
             h(
               'span',
               {
                 class: 'ml-2 text-red-800 align-top'
               },
               '*'
-            )
+            ),
+            formItem.render(formItem)
           ]
         : formItem.render(formItem)
     } else {
@@ -47,6 +74,10 @@ export default defineComponent({
     options: {
       type: Array as PropType<Array<FormItem | CommItem>>,
       require: true
+    },
+    rules: {
+      type: Object as PropType<FormRules>,
+      default: () => {}
     }
   },
   setup(props) {
@@ -92,12 +123,14 @@ export default defineComponent({
     )
 
     function reset() {
-      if (!optionsRender.value) return
-      optionsRender.value.forEach((it: FormItem) => {
-        if (it.reset) {
-          it.reset(it)
-        } else {
-          it.value.value = ''
+      if (!options.value) return
+      options.value.forEach((it: FormItem) => {
+        if (it.value) {
+          if (it.reset) {
+            it.reset(it)
+          } else {
+            it.value.value = null
+          }
         }
       })
     }
@@ -162,6 +195,8 @@ export default defineComponent({
       {
         ref: 'dataForm',
         labelPlacement: 'left',
+        labelAlign: 'right',
+        requireMarkPlacement: 'right-hanging',
         ...this.formConfig,
         style: {
           ...(this.formConfig.style as Object),

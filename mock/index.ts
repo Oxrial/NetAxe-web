@@ -67,6 +67,17 @@ export default [
     }
   },
   {
+    url: '/api/net_config/equipupdate/',
+    method: 'post',
+    response: () => {
+      return {
+        code: 200,
+        msg: '更新成功',
+        results: null
+      }
+    }
+  },
+  {
     url: '/api/net_config/equipList/',
     method: 'get',
     response: () => {

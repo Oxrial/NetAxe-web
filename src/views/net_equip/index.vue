@@ -36,20 +36,21 @@
       />
     </n-card>
     <ModalDialog
-      ref="itemModalDialogRef"
-      :style="{ height: '82vh', width: '76%', 'margin-top': '5vh' }"
-      :title="itemForm.modalDialogConfig.title"
-      :on-after-leave="itemForm.modalDialogConfig.close"
-      :footer="false"
+      ref="modalDialogRef"
+      :style="{ height: '60vh', width: '60%', 'margin-top': '7vh' }"
+      :title="dataForm.modalDialogConfig.title"
+      @confirm="dataForm.submitConfirm"
+      :on-after-leave="dataForm.modalDialogConfig.close"
     >
       <template #content>
         <DataForm
-          ref="itemDataFormRef"
-          :options="itemForm.itemFormOptions"
+          ref="dataFormRef"
+          :options="dataForm.formOptions"
           preset="dialog"
           :form-config="{
             labelWidth: 100,
-            labelAlign: 'left'
+            labelAlign: 'left',
+            rules: dataForm.rules
           }"
         />
       </template>
@@ -60,6 +61,7 @@
 <script setup lang="ts">
 import {
   DataFormType,
+  ModalDialogType,
   FormItem,
   ModalDialogType,
   Operation
@@ -95,8 +97,6 @@ const searchOptions: Array<FormItem | Operation> = [
       }
     ],
     render: (formItem: FormItem) => {
-      console.log(formItem);
-      
       return h(NSelect, {
         style: { width: '7.5rem' },
         value: formItem.value,
@@ -152,7 +152,7 @@ const searchOptions: Array<FormItem | Operation> = [
             type: 'info',
             size: 'small',
             onClick: () => {
-              itemModalDialogRef.value?.toggle()
+              modalDialogRef.value?.toggle()
             }
           },
           { icon: () => h(NIcon, {}, () => h(AddCircleOutlineRound)), default: () => h('span', '增加设备') }
@@ -241,8 +241,9 @@ const tableColumns = useTableColumn(
   } as DataTableColumn
 )
 onMounted(onSearch)
-const itemModalDialogRef = ref<ModalDialogType | null>(null)
-const itemDataFormRef = ref<ModalDialogType | null>(null)
+const modalDialogRef = ref<ModalDialogType | null>(null)
+const dataFormRef = ref<DataFormType | null>(null)
 import useEquipForm from './hooks/useEquipForm'
-const itemForm = useEquipForm({ doRefresh, itemModalDialogRef, itemDataFormRef })
+const dataForm = useEquipForm({ doRefresh, modalDialogRef, dataFormRef })
+
 </script>
