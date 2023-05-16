@@ -162,7 +162,7 @@ const conditionItems: Array<FormItem | Operation> = [
   {
     key: 'name',
     label: '任务名称',
-    value: ref(''),
+    value: ref(null),
     render: (formItem) => {
       return h(NInput, {
         value: formItem.value.value,
@@ -229,6 +229,7 @@ const conditionItems: Array<FormItem | Operation> = [
           {
             type: 'info',
             size: 'small',
+            disabled: !checkedRowKeys.value.length,
             onClick: () => {
               console.log('start', checkedRowKeys.value)
             }
@@ -240,6 +241,7 @@ const conditionItems: Array<FormItem | Operation> = [
           {
             type: 'error',
             size: 'small',
+            disabled: !checkedRowKeys.value.length,
             onClick: () => {
               console.log('stop', checkedRowKeys.value)
             }
@@ -256,7 +258,7 @@ const onResetSearch = () => {
 }
 const onSearch = () => {
   const search_form = searchForm.value?.generatorParams()
-  request_url = get_net_config_backupList + '?name=' + search_form.name + '&task=' + search_form.state
+  request_url = get_net_config_backupList + '?name=' + search_form.name + '&state=' + search_form.state
   doRefresh()
 }
 

@@ -57,10 +57,14 @@ export default defineComponent({
     function reset() {
       if (!options.value) return
       options.value.forEach((it: FormItem) => {
-        if (it.reset) {
-          it.reset(it)
-        } else {
-          it.value.value = ''
+        if (it.value) {
+          if (it.reset) {
+            it.reset(it)
+          } else {
+            console.log(it)
+
+            it.value.value = null
+          }
         }
       })
     }
