@@ -15,10 +15,13 @@ const data = Mock.mock({
   'equipList|100': [
     {
       name: '设备_@increment',
+      code: 'EQUIP@increment',
       'state|1': ['0', '1'],
       ip: '@IP',
       'type|1': ['1', '2', '3'],
       'ftpType|1': ['1', '2', '3'],
+      'center|1': ['1', '2', '3'],
+      version: 'v@integer(1,5).@integer(0,3).@integer(0,4)',
       subNetName: '@string(3, 6)',
       description: '@cparagraph(1,1,5)'
     }

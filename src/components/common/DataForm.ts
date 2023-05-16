@@ -1,5 +1,5 @@
-import { FormItem } from './../../types/components'
-import { FormProps, NForm, NFormItem, NFormItemGridItem, NGrid, useMessage } from 'naive-ui'
+import { FormItem, CommItem } from './../../types/components'
+import { FormProps, NForm, NInput, NFormItem, NFormItemGridItem, NGrid, useMessage } from 'naive-ui'
 // import service from '@/api/axios.config'
 
 function renderItem(formItem: FormItem) {
@@ -45,18 +45,55 @@ export default defineComponent({
       }
     },
     options: {
-      type: Array as PropType<Array<FormItem>>,
+      type: Array as PropType<Array<FormItem | CommItem>>,
       require: true
     }
   },
   setup(props) {
     const dataForm = ref<typeof NForm | null>(null)
-    const options = toRef(props, 'options')
+
+    // if ftype=common type NInput
+    function renderCommon(o: CommItem) {
+      return {
+        key: o.key,
+        label: o.label,
+        value: ref(''),
+        render: (formItem: FormItem) => {
+          return h(o.type || NInput, {
+            value: formItem.value.value,
+            clearable: true,
+            onUpdateValue: (val: any) => {
+              formItem.value.value = val
+            },
+            ...o.attrs
+          })
+        }
+      } as FormItem
+    }
+    const optionsRender = ref<Array<any>>([])
+
+    // const options = ref<Array<FormItem>[]>(optionsT)
     const message = useMessage()
+    watch(
+      () => props.options,
+      (n) => {
+        n &&
+          n.forEach((o) => {
+            if (o.ftype && ['common'].includes(o.ftype)) {
+              optionsRender.value.push(renderCommon(o as CommItem))
+            } else {
+              optionsRender.value.push(o)
+            }
+          })
+      },
+      {
+        immediate: true
+      }
+    )
 
     function reset() {
-      if (!options.value) return
-      options.value.forEach((it: FormItem) => {
+      if (!optionsRender.value) return
+      optionsRender.value.forEach((it: FormItem) => {
         if (it.reset) {
           it.reset(it)
         } else {
@@ -66,8 +103,8 @@ export default defineComponent({
     }
 
     function generatorParams() {
-      if (!options.value) return
-      return options.value
+      if (!optionsRender.value) return
+      return optionsRender.value
         .filter((o) => !!o.value)
         .reduce((pre: any, cur: FormItem) => {
           pre[cur.key] = cur.value.value
@@ -76,8 +113,8 @@ export default defineComponent({
     }
 
     function validator() {
-      if (!options.value) return
-      return options.value.every((it: FormItem) => {
+      if (!optionsRender.value) return
+      return optionsRender.value.every((it: FormItem) => {
         if (it.required) {
           if (it.validator) {
             return it.validator(it, message)
@@ -93,6 +130,7 @@ export default defineComponent({
     }
 
     return {
+      optionsRender: optionsRender.value,
       dataForm,
       reset,
       validator,
@@ -142,14 +180,14 @@ export default defineComponent({
                 },
                 {
                   default: () => {
-                    return this.options?.map((it) => {
+                    return this.optionsRender?.map((it) => {
                       return h(
                         NFormItemGridItem,
                         {
                           label: it.label
                         },
                         {
-                          default: renderItem(it)
+                          default: renderItem(it as FormItem)
                         }
                       )
                     })
@@ -166,7 +204,7 @@ export default defineComponent({
                 },
                 {
                   default: () => {
-                    return this.options?.map((it) => {
+                    return this.optionsRender?.map((it) => {
                       return h(
                         NFormItemGridItem,
                         {
@@ -182,7 +220,7 @@ export default defineComponent({
                 }
               )
             : this.preset === 'dialog'
-            ? this.options?.map((it) => {
+            ? this.optionsRender?.map((it) => {
                 return h(
                   NFormItem,
                   {
@@ -201,7 +239,7 @@ export default defineComponent({
                 )
               })
             : this.preset === 'search'
-            ? this.options?.map((it) => {
+            ? this.optionsRender?.map((it) => {
                 return h(
                   NFormItem,
                   {
@@ -219,7 +257,7 @@ export default defineComponent({
                   }
                 )
               })
-            : this.options?.map((it) => {
+            : this.optionsRender?.map((it) => {
                 return h(
                   NFormItem,
                   {

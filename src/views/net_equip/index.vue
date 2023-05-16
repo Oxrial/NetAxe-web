@@ -10,7 +10,7 @@
   <div class="main-container">
     <n-card>
       <DataForm
-        ref="equipSearchFormRef"
+        ref="searchFormRef"
         :form-config="{
           labelWidth: 'auto',
           style: {
@@ -18,7 +18,7 @@
           }
         }"
         preset="search"
-        :options="equipSearchOptions"
+        :options="searchOptions"
       />
       <n-data-table
         :loading="tableLoading"
@@ -35,38 +35,25 @@
         flex-height
       />
     </n-card>
-    <!-- <ModalDialog
-      ref="confFilesModalDialogRef"
+    <ModalDialog
+      ref="itemModalDialogRef"
       :style="{ height: '82vh', width: '76%', 'margin-top': '5vh' }"
-      :on-after-leave="confFiles.modalDialogConfig.close"
+      :title="itemForm.modalDialogConfig.title"
+      :on-after-leave="itemForm.modalDialogConfig.close"
       :footer="false"
     >
-      <template #header> {{ confFiles.fileRowData.value?.name }} 设备信息 </template>
       <template #content>
-        <n-descriptions
-          label-style="font-weight: bold;"
-          label-placement="left"
-          :column="1"
-          style="width: 80%; font-size: 16px; margin: 0.625rem auto 1.25rem auto"
-        >
-          <n-descriptions-item label="设备名称"> {{ confFiles.fileRowData.value?.name }} </n-descriptions-item>
-          <n-descriptions-item label="设备IP"> {{ confFiles.fileRowData.value?.ip }} </n-descriptions-item>
-        </n-descriptions>
-        <n-data-table
-          :data="confFiles.dataList"
-          :columns="confFiles.tableColumns"
-          :pagination="{
-            prefix: tablePrefix,
-            pageSize: 10,
-            showSizePicker: true,
-            pageSizes: [10, 30, 50]
+        <DataForm
+          ref="itemDataFormRef"
+          :options="itemForm.itemFormOptions"
+          preset="dialog"
+          :form-config="{
+            labelWidth: 100,
+            labelAlign: 'left'
           }"
-          style="height: calc(100% - 6rem); width: 80%; margin: 0 auto"
-          size="small"
-          flex-height
         />
       </template>
-    </ModalDialog> -->
+    </ModalDialog>
   </div>
 </template>
 
@@ -74,6 +61,7 @@
 import {
   DataFormType,
   FormItem,
+  ModalDialogType,
   Operation
   // , ModalDialogType
 } from '@/types/components'
@@ -81,21 +69,21 @@ import { DataTableColumn, NInput, NSelect, SelectOption, useMessage, NButton, NI
 import { tablePrefix } from '@/utils'
 import { useTable, useTableColumn } from '@/hooks/table'
 import { useGet } from '@/hooks/useApi'
-import { get_net_filesList } from '@/api/url'
-import { RestartAltTwotone } from '@vicons/material'
+import { get_net_equipList } from '@/api/url'
+import { RestartAltTwotone, AddCircleOutlineRound } from '@vicons/material'
 
-const equipSearchOptions: Array<FormItem | Operation> = [
+const searchOptions: Array<FormItem | Operation> = [
   {
     key: 'column',
     label: '',
-    value: ref(null),
+    value: ref(''),
     formItemConfig: {
       labeWidth: '10px'
     },
     style: {
       minWidth: 'unset'
     },
-    reset: (formItem: FormItem) => (formItem.value.value = null),
+    reset: (formItem: FormItem) => (formItem.value = ''),
     optionItems: [
       {
         label: '名称',
@@ -107,14 +95,17 @@ const equipSearchOptions: Array<FormItem | Operation> = [
       }
     ],
     render: (formItem: FormItem) => {
+      console.log(formItem);
+      
       return h(NSelect, {
         style: { width: '7.5rem' },
-        value: formItem.value.value,
+        value: formItem.value,
         clearable: true,
         options: formItem.optionItems as Array<SelectOption>,
         placeholder: '过滤条件',
         onUpdateValue: (val) => {
-          formItem.value.value = val
+      console.log('s',formItem);
+          formItem.value = val
         }
       })
     }
@@ -124,11 +115,13 @@ const equipSearchOptions: Array<FormItem | Operation> = [
     label: '',
     value: ref(''),
     render: (formItem: FormItem) => {
+      console.log(formItem);
       return h(NInput, {
         value: formItem.value.value,
         clearable: true,
         onUpdateValue: (val) => {
-          formItem.value.value = val
+      console.log('s',formItem.value);
+          formItem.value = val
         },
         onKeyup: (Event) => {
           if (Event.key == 'Enter') {
@@ -152,6 +145,17 @@ const equipSearchOptions: Array<FormItem | Operation> = [
             }
           },
           { icon: () => h(NIcon, {}, () => h(RestartAltTwotone)), default: () => h('span', '重置') }
+        ),
+        h(
+          NButton,
+          {
+            type: 'info',
+            size: 'small',
+            onClick: () => {
+              itemModalDialogRef.value?.toggle()
+            }
+          },
+          { icon: () => h(NIcon, {}, () => h(AddCircleOutlineRound)), default: () => h('span', '增加设备') }
         )
       ])
   }
@@ -161,7 +165,7 @@ const message = useMessage()
 
 const doRefresh = () => {
   get({
-    url: get_net_filesList,
+    url: get_net_equipList,
     data: () => {
       return {
         _: Date.now()
@@ -175,9 +179,9 @@ const doRefresh = () => {
 const onSearch = () => {
   doRefresh()
 }
-const equipSearchFormRef = ref<DataFormType | null>(null)
+const searchFormRef = ref<DataFormType | null>(null)
 const onResetSearch = () => {
-  equipSearchFormRef.value?.reset()
+  searchFormRef.value?.reset()
 }
 export interface RowData {
   name: string
@@ -237,7 +241,8 @@ const tableColumns = useTableColumn(
   } as DataTableColumn
 )
 onMounted(onSearch)
-// const confFilesModalDialogRef = ref<ModalDialogType | null>(null)
-// import useConfFiles from './hooks/files/useConfFiles'
-// const confFiles = useConfFiles({ confFilesModalDialogRef })
+const itemModalDialogRef = ref<ModalDialogType | null>(null)
+const itemDataFormRef = ref<ModalDialogType | null>(null)
+import useEquipForm from './hooks/useEquipForm'
+const itemForm = useEquipForm({ doRefresh, itemModalDialogRef, itemDataFormRef })
 </script>

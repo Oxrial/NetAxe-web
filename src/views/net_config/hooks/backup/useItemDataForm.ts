@@ -30,8 +30,7 @@ export default function ({ doRefresh, backupModalDialogRef, itemDataFormRef, sel
           value: formItem.value.value,
           onUpdateValue: (newVal: any) => {
             formItem.value.value = newVal
-          },
-          maxlength: 50
+          }
         })
       }
     },
