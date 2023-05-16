@@ -364,7 +364,5 @@ const selectEquipModalDialogRef = ref<ModalDialogType | null>(null)
 const equipSearchFormRef = ref<DataFormType | null>(null)
 const itemDataForm = useItemDataForm({ doRefresh, backupModalDialogRef, itemDataFormRef, selectEquipModalDialogRef, equipSearchFormRef })
 const { selectEquip } = itemDataForm
-onMounted(() => {
-  onSearch()
-})
+onMounted(onSearch)
 </script>

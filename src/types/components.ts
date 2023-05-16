@@ -47,7 +47,15 @@ export interface FormItem extends TableSearchItem {
   render?: (formItem: FormItem) => VNode
   [key: string]: any
 }
-
+export interface CommItem {
+  key: string | number
+  label: string
+  type?: any
+  ftype: 'common'
+  required?: boolean
+  palceholder?: string
+  attrs?: object
+}
 export interface LikeSearchModel {
   conditionItems: Array<TableSearchItem> | null
   extraParams?: (() => Record<string, any>) | Record<string, any>

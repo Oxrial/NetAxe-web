@@ -1,20 +1,47 @@
-import { FormItem } from './../../types/components'
-import { FormProps, NForm, NFormItem, NFormItemGridItem, NGrid, useMessage } from 'naive-ui'
+import { FormItem, CommItem } from './../../types/components'
+import { NInput, FormProps, NForm, NFormItem, NFormItemGridItem, NGrid, useMessage } from 'naive-ui'
+import type { FormRules } from 'naive-ui'
 // import service from '@/api/axios.config'
 
+export const renderCommon = (o: CommItem) => {
+  return {
+    key: o.key,
+    label: o.label,
+    value: ref(null),
+    required: o.required || false,
+    render: (formItem: FormItem) => {
+      !o.type && (o.type = NInput)
+      const placeholder = o.type !== NInput ? o.palceholder || null : '请输入' + o.label
+      return h(o.type, {
+        value: formItem.value.value,
+        clearable: true,
+        onUpdateValue: (val: any) => {
+          formItem.value.value = val
+        },
+        placeholder,
+        ...o.attrs
+      })
+    }
+  }
+}
+export const useLoadCommon = (tempOptions: CommItem[]) => {
+  const formOptions: Array<FormItem> = []
+  tempOptions.forEach((o) => o.ftype === 'common' && formOptions.push(renderCommon(o) as FormItem))
+  return formOptions
+}
 function renderItem(formItem: FormItem) {
   return function () {
     if (formItem.render) {
       return formItem.required
         ? [
-            formItem.render(formItem),
             h(
               'span',
               {
                 class: 'ml-2 text-red-800 align-top'
               },
               '*'
-            )
+            ),
+            formItem.render(formItem)
           ]
         : formItem.render(formItem)
     } else {
@@ -47,6 +74,10 @@ export default defineComponent({
     options: {
       type: Array as PropType<Array<FormItem>>,
       require: true
+    },
+    rules: {
+      type: Object as PropType<FormRules>,
+      default: () => {}
     }
   },
   setup(props) {
@@ -61,8 +92,6 @@ export default defineComponent({
           if (it.reset) {
             it.reset(it)
           } else {
-            console.log(it)
-
             it.value.value = null
           }
         }
@@ -128,6 +157,8 @@ export default defineComponent({
       {
         ref: 'dataForm',
         labelPlacement: 'left',
+        labelAlign: 'right',
+        requireMarkPlacement: 'right-hanging',
         ...this.formConfig,
         style: {
           ...(this.formConfig.style as Object),

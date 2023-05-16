@@ -10,7 +10,7 @@
   <div class="main-container">
     <n-card>
       <DataForm
-        ref="equipSearchFormRef"
+        ref="searchFormRef"
         :form-config="{
           labelWidth: 'auto',
           style: {
@@ -18,7 +18,7 @@
           }
         }"
         preset="search"
-        :options="equipSearchOptions"
+        :options="searchOptions"
       />
       <n-data-table
         :loading="tableLoading"
@@ -35,44 +35,33 @@
         flex-height
       />
     </n-card>
-    <!-- <ModalDialog
-      ref="confFilesModalDialogRef"
-      :style="{ height: '82vh', width: '76%', 'margin-top': '5vh' }"
-      :on-after-leave="confFiles.modalDialogConfig.close"
-      :footer="false"
+    <ModalDialog
+      ref="modalDialogRef"
+      :style="{ height: '60vh', width: '60%', 'margin-top': '7vh' }"
+      :title="dataForm.modalDialogConfig.title"
+      @confirm="dataForm.submitConfirm"
+      :on-after-leave="dataForm.modalDialogConfig.close"
     >
-      <template #header> {{ confFiles.fileRowData.value?.name }} 设备信息 </template>
       <template #content>
-        <n-descriptions
-          label-style="font-weight: bold;"
-          label-placement="left"
-          :column="1"
-          style="width: 80%; font-size: 16px; margin: 0.625rem auto 1.25rem auto"
-        >
-          <n-descriptions-item label="设备名称"> {{ confFiles.fileRowData.value?.name }} </n-descriptions-item>
-          <n-descriptions-item label="设备IP"> {{ confFiles.fileRowData.value?.ip }} </n-descriptions-item>
-        </n-descriptions>
-        <n-data-table
-          :data="confFiles.dataList"
-          :columns="confFiles.tableColumns"
-          :pagination="{
-            prefix: tablePrefix,
-            pageSize: 10,
-            showSizePicker: true,
-            pageSizes: [10, 30, 50]
+        <DataForm
+          ref="dataFormRef"
+          :options="dataForm.formOptions"
+          preset="dialog"
+          :form-config="{
+            labelWidth: 100,
+            labelAlign: 'left',
+            rules: dataForm.rules
           }"
-          style="height: calc(100% - 6rem); width: 80%; margin: 0 auto"
-          size="small"
-          flex-height
         />
       </template>
-    </ModalDialog> -->
+    </ModalDialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import {
   DataFormType,
+  ModalDialogType,
   FormItem,
   Operation
   // , ModalDialogType
@@ -81,10 +70,10 @@ import { DataTableColumn, NInput, NSelect, SelectOption, useMessage, NButton, NI
 import { tablePrefix } from '@/utils'
 import { useTable, useTableColumn } from '@/hooks/table'
 import { useGet } from '@/hooks/useApi'
-import { get_net_filesList } from '@/api/url'
-import { RestartAltTwotone } from '@vicons/material'
+import { get_net_equipList } from '@/api/url'
+import { RestartAltTwotone, AddCircleOutlineRound } from '@vicons/material'
 
-const equipSearchOptions: Array<FormItem | Operation> = [
+const searchOptions: Array<FormItem | Operation> = [
   {
     key: 'column',
     label: '',
@@ -152,6 +141,17 @@ const equipSearchOptions: Array<FormItem | Operation> = [
             }
           },
           { icon: () => h(NIcon, {}, () => h(RestartAltTwotone)), default: () => h('span', '重置') }
+        ),
+        h(
+          NButton,
+          {
+            type: 'info',
+            size: 'small',
+            onClick: () => {
+              modalDialogRef.value?.toggle()
+            }
+          },
+          { icon: () => h(NIcon, {}, () => h(AddCircleOutlineRound)), default: () => h('span', '增加设备') }
         )
       ])
   }
@@ -161,7 +161,7 @@ const message = useMessage()
 
 const doRefresh = () => {
   get({
-    url: get_net_filesList,
+    url: get_net_equipList,
     data: () => {
       return {
         _: Date.now()
@@ -175,9 +175,9 @@ const doRefresh = () => {
 const onSearch = () => {
   doRefresh()
 }
-const equipSearchFormRef = ref<DataFormType | null>(null)
+const searchFormRef = ref<DataFormType | null>(null)
 const onResetSearch = () => {
-  equipSearchFormRef.value?.reset()
+  searchFormRef.value?.reset()
 }
 export interface RowData {
   name: string
@@ -237,7 +237,8 @@ const tableColumns = useTableColumn(
   } as DataTableColumn
 )
 onMounted(onSearch)
-// const confFilesModalDialogRef = ref<ModalDialogType | null>(null)
-// import useConfFiles from './hooks/files/useConfFiles'
-// const confFiles = useConfFiles({ confFilesModalDialogRef })
+const modalDialogRef = ref<ModalDialogType | null>(null)
+const dataFormRef = ref<DataFormType | null>(null)
+import useEquipForm from './hooks/useEquipForm'
+const dataForm = useEquipForm({ doRefresh, modalDialogRef, dataFormRef })
 </script>
