@@ -31,7 +31,7 @@ export const get_net_config_backupupdate = '/api/net_config/backupupdate/'
 export const get_net_config_equipupdate = '/api/net_config/equipupdate/'
 export const get_net_equipList = '/api/net_config/equipList/'
 export const get_net_filesList = '/api/net_config/filesList/'
-export const get_net_confFilesList = '/api/net_config/confFilesList/'
+export const get_net_conf_files_list = '/api/net_config/conf_files_list/'
 // 拓扑图
 export const get_topology = '/api/topology/index/'
 export const topology_show = '/api/topology/show/'

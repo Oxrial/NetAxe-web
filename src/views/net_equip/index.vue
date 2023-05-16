@@ -63,6 +63,7 @@ import {
   DataFormType,
   ModalDialogType,
   FormItem,
+  ModalDialogType,
   Operation
   // , ModalDialogType
 } from '@/types/components'
@@ -77,14 +78,14 @@ const searchOptions: Array<FormItem | Operation> = [
   {
     key: 'column',
     label: '',
-    value: ref(null),
+    value: ref(''),
     formItemConfig: {
       labeWidth: '10px'
     },
     style: {
       minWidth: 'unset'
     },
-    reset: (formItem: FormItem) => (formItem.value.value = null),
+    reset: (formItem: FormItem) => (formItem.value = ''),
     optionItems: [
       {
         label: '名称',
@@ -98,12 +99,13 @@ const searchOptions: Array<FormItem | Operation> = [
     render: (formItem: FormItem) => {
       return h(NSelect, {
         style: { width: '7.5rem' },
-        value: formItem.value.value,
+        value: formItem.value,
         clearable: true,
         options: formItem.optionItems as Array<SelectOption>,
         placeholder: '过滤条件',
         onUpdateValue: (val) => {
-          formItem.value.value = val
+      console.log('s',formItem);
+          formItem.value = val
         }
       })
     }
@@ -113,11 +115,13 @@ const searchOptions: Array<FormItem | Operation> = [
     label: '',
     value: ref(''),
     render: (formItem: FormItem) => {
+      console.log(formItem);
       return h(NInput, {
         value: formItem.value.value,
         clearable: true,
         onUpdateValue: (val) => {
-          formItem.value.value = val
+      console.log('s',formItem.value);
+          formItem.value = val
         },
         onKeyup: (Event) => {
           if (Event.key == 'Enter') {
@@ -241,4 +245,5 @@ const modalDialogRef = ref<ModalDialogType | null>(null)
 const dataFormRef = ref<DataFormType | null>(null)
 import useEquipForm from './hooks/useEquipForm'
 const dataForm = useEquipForm({ doRefresh, modalDialogRef, dataFormRef })
+
 </script>

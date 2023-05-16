@@ -1,7 +1,7 @@
 import { useTable, useTableColumn } from '@/hooks/table'
 import { DataTableColumn, NIcon, useMessage } from 'naive-ui'
 import { useGet } from '@/hooks/useApi'
-import { get_net_confFilesList } from '@/api/url'
+import { get_net_conf_files_list } from '@/api/url'
 import { RowData as FileRowData } from '../../files.vue'
 import { FileDownload } from '@vicons/fa'
 
@@ -55,7 +55,7 @@ export default function ({ confFilesModalDialogRef }: any) {
   const message = useMessage()
   const doRefresh = () => {
     get({
-      url: get_net_confFilesList,
+      url: get_net_conf_files_list,
       data: () => {
         return {
           fileName: fileRowData.value?.name,
