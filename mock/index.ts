@@ -477,9 +477,42 @@ export default [
                 children: null
               }
             ]
+          },
+          {
+            id: 20009,
+            parent: null,
+            icon: null,
+            sort: 9,
+            name: '网络设备管理',
+            is_link: false,
+            is_catalog: false,
+            web_path: '/net_work',
+            component: null,
+            component_name: null,
+            cache: false,
+            visible: true,
+            menuPermission: [],
+            children: [
+              {
+                id: 20091,
+                parent: 20009,
+                icon: 'Youtube-fill',
+                sort: 1,
+                name: '防火墙自动化',
+                is_link: false,
+                is_catalog: false,
+                web_path: '/net_work/firewall',
+                component: null,
+                component_name: null,
+                cache: false,
+                visible: true,
+                menuPermission: [],
+                children: null
+              }
+            ]
           }
         ],
-        count: 8,
+        count: 9,
         page: 1,
         limit: 1
       }

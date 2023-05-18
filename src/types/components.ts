@@ -33,6 +33,13 @@ export interface TableSearchItem {
 export interface Operation {
   render: () => VNode
 }
+export interface GridRender {
+  key: string
+  render: (formItem: FormItem, gridGender: GridRender) => VNode
+}
+
+export type OriginItem = CommItem | FormItem
+
 export interface FormItem extends TableSearchItem {
   required?: boolean
   validator?: (value: FormItem, message: MessageApi) => boolean
@@ -45,15 +52,17 @@ export interface FormItem extends TableSearchItem {
   path?: string
   reset?: (formItem: FormItem) => void
   render?: (formItem: FormItem) => VNode
+  grid?: Array<GridRender>
   [key: string]: any
 }
 export interface CommItem {
   key: string | number
   label: string
   type?: any
-  ftype: 'common'
+  ftype: 'common' | null
+  options?: Array<SelectOptionItem>
   required?: boolean
-  palceholder?: string
+  placeholder?: string
   attrs?: object
 }
 export interface LikeSearchModel {
@@ -73,6 +82,7 @@ export interface TablePropsType {
 export type ModalDialogType = InstanceType<typeof import('../components/common/ModalDialog.vue').default>
 
 export type DataFormType = InstanceType<typeof import('../components/common/DataForm').default>
+export type CommFormType = InstanceType<typeof import('../components/common/CommForm').default>
 
 export type TableHeaderType = InstanceType<typeof import('../components/common/TableHeader.vue').default>
 

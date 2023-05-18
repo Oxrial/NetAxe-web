@@ -9,14 +9,15 @@
 <template>
   <div class="main-container">
     <n-card>
-      <DataForm
-        ref="searchForm"
+      <CommForm
+        ref="searchFormRef"
         :form-config="{
           labelWidth: 80,
           size: 'medium'
         }"
         preset="search"
-        :options="conditionItems"
+        :options="formOptions"
+        @submit="onSearch"
       />
       <n-data-table
         :loading="tableLoading"
@@ -31,24 +32,25 @@
       />
     </n-card>
     <ModalDialog
-      ref="backupModalDialogRef"
-      :title="itemDataForm.modalDialogConfig.title + '备份任务'"
-      @confirm="itemDataForm.submitConfirm"
+      ref="modalDialogRef"
+      :title="dataForm.modalDialogConfig.title + '备份任务'"
+      @confirm="dataFormRef?.submit"
       :style="{ height: '82vh', width: '76%', 'margin-top': '5vh' }"
-      :on-after-leave="itemDataForm.modalDialogConfig.close"
+      :on-after-leave="dataForm.modalDialogConfig.close"
     >
       <template #content>
-        <DataForm
-          ref="itemDataFormRef"
-          :options="itemDataForm.itemFormOptions"
+        <CommForm
+          ref="dataFormRef"
+          :options="dataForm.formOptions"
           preset="dialog"
           :form-config="{
             labelWidth: 80,
             labelAlign: 'left'
           }"
+          @submit="dataForm.submitConfirm"
         />
         <n-data-table
-          :data="itemDataForm.checkedDataList()"
+          :data="dataForm.checkedDataList()"
           :columns="selectEquip.tableColumns"
           :pagination="{
             prefix: tablePrefix,
@@ -59,8 +61,8 @@
           size="small"
           style="height: calc(100% - 12rem); width: 80%; margin: 0 auto"
           :row-key="selectEquip.rowKey"
-          v-model:checked-row-keys="itemDataForm.checkedSelectEquipRowKeys.value"
-          @update:checked-row-keys="itemDataForm.updateCheckedSelectEquipRowKeys"
+          v-model:checked-row-keys="dataForm.checkedSelectEquipRowKeys.value"
+          @update:checked-row-keys="dataForm.updateCheckedSelectEquipRowKeys"
           flex-height
         />
       </template>
@@ -150,52 +152,41 @@
 import { useGet } from '@/hooks/useApi'
 import { get_net_config_backupList } from '@/api/url'
 
-import { DataFormType, ModalDialogType, FormItem, Operation } from '@/types/components'
-import { DataTableColumn, NInput, NSelect, SelectOption, useMessage, NButton, NIcon, NSpace, DataTableRowKey } from 'naive-ui'
+import { CommFormType, ModalDialogType, FormItem, Operation, OriginItem } from '@/types/components'
+import { NSelect, DataTableColumn, useMessage, NButton, NIcon, NSpace, DataTableRowKey } from 'naive-ui'
 import { useTable } from '@/hooks/table'
 import { tablePrefix } from '@/utils'
+import { useLoadCommon } from '@/utils/CommForm'
 import { RestartAltTwotone, AddCircleOutlineRound, NotStartedOutlined, StopCircleOutlined } from '@vicons/material'
 
-const searchForm = ref<DataFormType | null>(null)
+const searchFormRef = ref<CommFormType | null>(null)
 
-const conditionItems: Array<FormItem | Operation> = [
+const commOptions = [
   {
     key: 'name',
     label: '任务名称',
-    value: ref(null),
-    render: (formItem) => {
-      return h(NInput, {
-        value: formItem.value.value,
-        onUpdateValue: (val) => {
-          formItem.value.value = val
-        },
-        onKeyup: (Event) => {
-          if (Event.key == 'Enter') {
-            onSearch()
-          }
+    ftype: null,
+    attrs: {
+      onKeyup: (Event: any) => {
+        if (Event.key == 'Enter') {
+          searchFormRef.value?.submit()
         }
-      })
+      }
     }
   },
-
   {
     key: 'state',
     label: '状态',
-    value: ref(null),
-    optionItems: [
+    ftype: null,
+    type: NSelect,
+    options: [
       { value: '1', label: '开启' },
       { value: '0', label: '关闭' }
     ],
-    render: (formItem) => {
-      return h(NSelect, {
-        options: formItem.optionItems as Array<SelectOption>,
-        value: formItem.value.value,
-        clearable: true,
-        onUpdateValue: (val) => {
-          formItem.value.value = val
-          onSearch()
-        }
-      })
+    attrs: {
+      afterOnUpdateValue: () => {
+        searchFormRef.value?.submit()
+      }
     }
   },
   {
@@ -207,8 +198,8 @@ const conditionItems: Array<FormItem | Operation> = [
             type: 'success',
             size: 'small',
             onClick: () => {
-              onResetSearch()
-              onSearch()
+              searchFormRef.value?.reset()
+              searchFormRef.value?.submit()
             }
           },
           { icon: () => h(NIcon, {}, () => h(RestartAltTwotone)), default: () => h('span', '重置') }
@@ -219,7 +210,7 @@ const conditionItems: Array<FormItem | Operation> = [
             type: 'info',
             size: 'small',
             onClick: () => {
-              backupModalDialogRef.value?.toggle()
+              modalDialogRef.value?.toggle()
             }
           },
           { icon: () => h(NIcon, {}, () => h(AddCircleOutlineRound)), default: () => h('span', '新建') }
@@ -250,15 +241,11 @@ const conditionItems: Array<FormItem | Operation> = [
         )
       ])
   }
-]
-let request_url = ''
-
-const onResetSearch = () => {
-  searchForm.value?.reset()
-}
-const onSearch = () => {
-  const search_form = searchForm.value?.generatorParams()
-  request_url = get_net_config_backupList + '?name=' + search_form.name + '&state=' + search_form.state
+] as Array<OriginItem | Operation>
+const formOptions = useLoadCommon(commOptions) as Array<FormItem>
+let submitSearchData: object | null = null
+const onSearch = (obj: any) => {
+  submitSearchData = obj
   doRefresh()
 }
 
@@ -270,9 +257,10 @@ const { tableLoading, dataList } = table
 
 const doRefresh = () => {
   get({
-    url: request_url,
+    url: get_net_config_backupList,
     data: () => {
       return {
+        ...submitSearchData,
         _: Date.now()
       }
     }
@@ -357,12 +345,13 @@ const updateCheckedRowKeys = (rowKeys: DataTableRowKey[]) => {
   checkedRowKeys.value = rowKeys
 }
 
-import useItemDataForm from './hooks/backup/useItemDataForm'
-const backupModalDialogRef = ref<ModalDialogType | null>(null)
-const itemDataFormRef = ref<DataFormType | null>(null)
+const modalDialogRef = ref<ModalDialogType | null>(null)
+const dataFormRef = ref<CommFormType | null>(null)
 const selectEquipModalDialogRef = ref<ModalDialogType | null>(null)
-const equipSearchFormRef = ref<DataFormType | null>(null)
-const itemDataForm = useItemDataForm({ doRefresh, backupModalDialogRef, itemDataFormRef, selectEquipModalDialogRef, equipSearchFormRef })
-const { selectEquip } = itemDataForm
-onMounted(onSearch)
+const equipSearchFormRef = ref<CommFormType | null>(null)
+
+import useBackupForm from './hooks/backup/useBackupForm'
+const dataForm = useBackupForm({ doRefresh, modalDialogRef, dataFormRef, selectEquipModalDialogRef, equipSearchFormRef })
+const { selectEquip } = dataForm
+onMounted(() => searchFormRef.value?.submit())
 </script>

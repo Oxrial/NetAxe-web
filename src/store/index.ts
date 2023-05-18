@@ -16,7 +16,6 @@ function presistSettingInfo(setting: any) {
 }
 
 const primaryColor = Setting.themeColor.split('@')[1]
-console.log('>>>',Setting.actionBar);
 
 const originState = {
   isCollapse: false,

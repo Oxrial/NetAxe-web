@@ -9,7 +9,7 @@
 <template>
   <div class="main-container">
     <n-card>
-      <DataForm
+      <CommForm
         ref="searchFormRef"
         :form-config="{
           labelWidth: 'auto',
@@ -18,7 +18,8 @@
           }
         }"
         preset="search"
-        :options="searchOptions"
+        :options="formOptions"
+        @submit="onSearch"
       />
       <n-data-table
         :loading="tableLoading"
@@ -37,21 +38,22 @@
     </n-card>
     <ModalDialog
       ref="modalDialogRef"
-      :style="{ height: '60vh', width: '60%', 'margin-top': '7vh' }"
+      :style="{ height: '60vh', width: '50%', 'margin-top': '7vh' }"
       :title="dataForm.modalDialogConfig.title"
-      @confirm="dataForm.submitConfirm"
+      @confirm="dataFormRef?.submit"
       :on-after-leave="dataForm.modalDialogConfig.close"
     >
       <template #content>
-        <DataForm
+        <CommForm
           ref="dataFormRef"
           :options="dataForm.formOptions"
           preset="dialog"
+          :rules="dataForm.rules"
           :form-config="{
             labelWidth: 100,
-            labelAlign: 'left',
-            rules: dataForm.rules
+            labelAlign: 'left'
           }"
+          @submit="dataForm.submitConfirm"
         />
       </template>
     </ModalDialog>
@@ -59,76 +61,25 @@
 </template>
 
 <script setup lang="ts">
-import {
-  DataFormType,
-  ModalDialogType,
-  FormItem,
-  ModalDialogType,
-  Operation
-  // , ModalDialogType
-} from '@/types/components'
-import { DataTableColumn, NInput, NSelect, SelectOption, useMessage, NButton, NIcon, NSpace } from 'naive-ui'
+import { CommFormType, ModalDialogType, FormItem, OriginItem, Operation } from '@/types/components'
+import { DataTableColumn, useMessage, NButton, NIcon, NSpace } from 'naive-ui'
 import { tablePrefix } from '@/utils'
 import { useTable, useTableColumn } from '@/hooks/table'
 import { useGet } from '@/hooks/useApi'
 import { get_net_equipList } from '@/api/url'
 import { RestartAltTwotone, AddCircleOutlineRound } from '@vicons/material'
 
-const searchOptions: Array<FormItem | Operation> = [
+const commOptions = [
   {
-    key: 'column',
-    label: '',
-    value: ref(''),
-    formItemConfig: {
-      labeWidth: '10px'
-    },
-    style: {
-      minWidth: 'unset'
-    },
-    reset: (formItem: FormItem) => (formItem.value = ''),
-    optionItems: [
-      {
-        label: '名称',
-        value: 'name'
-      },
-      {
-        label: 'IP地址',
-        value: 'ip'
+    key: 'name',
+    label: '设备名称',
+    ftype: null,
+    attrs: {
+      onKeyup: (Event: any) => {
+        if (Event.key == 'Enter') {
+          searchFormRef.value?.submit()
+        }
       }
-    ],
-    render: (formItem: FormItem) => {
-      return h(NSelect, {
-        style: { width: '7.5rem' },
-        value: formItem.value,
-        clearable: true,
-        options: formItem.optionItems as Array<SelectOption>,
-        placeholder: '过滤条件',
-        onUpdateValue: (val) => {
-      console.log('s',formItem);
-          formItem.value = val
-        }
-      })
-    }
-  },
-  {
-    key: 'filterValue',
-    label: '',
-    value: ref(''),
-    render: (formItem: FormItem) => {
-      console.log(formItem);
-      return h(NInput, {
-        value: formItem.value.value,
-        clearable: true,
-        onUpdateValue: (val) => {
-      console.log('s',formItem.value);
-          formItem.value = val
-        },
-        onKeyup: (Event) => {
-          if (Event.key == 'Enter') {
-            onSearch()
-          }
-        }
-      })
     }
   },
   {
@@ -140,8 +91,8 @@ const searchOptions: Array<FormItem | Operation> = [
             type: 'success',
             size: 'small',
             onClick: () => {
-              onResetSearch()
-              onSearch()
+              searchFormRef.value?.reset()
+              searchFormRef.value?.submit()
             }
           },
           { icon: () => h(NIcon, {}, () => h(RestartAltTwotone)), default: () => h('span', '重置') }
@@ -159,7 +110,8 @@ const searchOptions: Array<FormItem | Operation> = [
         )
       ])
   }
-]
+] as Array<OriginItem | Operation>
+const formOptions = useLoadCommon(commOptions) as Array<FormItem>
 const get = useGet()
 const message = useMessage()
 
@@ -168,6 +120,7 @@ const doRefresh = () => {
     url: get_net_equipList,
     data: () => {
       return {
+        ...submitSearchData,
         _: Date.now()
       }
     }
@@ -176,13 +129,12 @@ const doRefresh = () => {
     table.handleSuccess(res)
   })
 }
-const onSearch = () => {
+let submitSearchData: object | null = null
+const onSearch = (obj: any) => {
+  submitSearchData = obj
   doRefresh()
 }
-const searchFormRef = ref<DataFormType | null>(null)
-const onResetSearch = () => {
-  searchFormRef.value?.reset()
-}
+const searchFormRef = ref<CommFormType | null>(null)
 export interface RowData {
   name: string
   ip: string
@@ -240,10 +192,10 @@ const tableColumns = useTableColumn(
     align: 'center'
   } as DataTableColumn
 )
-onMounted(onSearch)
+onMounted(() => searchFormRef.value?.submit())
 const modalDialogRef = ref<ModalDialogType | null>(null)
-const dataFormRef = ref<DataFormType | null>(null)
+const dataFormRef = ref<CommFormType | null>(null)
 import useEquipForm from './hooks/useEquipForm'
+import { useLoadCommon } from '@/utils/CommForm'
 const dataForm = useEquipForm({ doRefresh, modalDialogRef, dataFormRef })
-
 </script>

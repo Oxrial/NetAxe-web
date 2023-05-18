@@ -1,84 +1,77 @@
 import { get_net_config_backupupdate } from '@/api/url'
-import { FormItem } from '@/types/components'
-import { NInput, NSelect, useMessage, NButton, NTimePicker } from 'naive-ui'
+import { FormItem, GridRender, Operation, OriginItem } from '@/types/components'
+import { NSelect, useMessage, NButton, NTimePicker } from 'naive-ui'
 import { usePost } from '@/hooks/useApi'
 import type { DataTableRowKey } from 'naive-ui'
 import { remove } from 'lodash-es'
 import { arrClear } from '@/utils'
 import useSelectEquip from './useSelectEquip'
+import { useLoadCommon } from '@/utils/CommForm'
 
-export default function ({ doRefresh, backupModalDialogRef, itemDataFormRef, selectEquipModalDialogRef }: any) {
+export default function ({ doRefresh, modalDialogRef, dataFormRef, selectEquipModalDialogRef }: any) {
   const modalDialogConfig = {
     title: '新建',
     close: () => {
-      itemDataFormRef?.value?.reset()
-      const time = itemDataFormRef?.value?.options.find((o: FormItem) => o.key === 'time')
-      time.typeValue.value = ''
-      time.timeValue.value = null
+      dataFormRef.value?.reset()
     }
   }
 
-  const selectEquip = useSelectEquip({ itemDataFormRef, selectEquipModalDialogRef })
+  const selectEquip = useSelectEquip({ dataFormRef, selectEquipModalDialogRef })
 
-  const itemFormOptions = [
+  const commOptions = [
     {
       key: 'name',
       label: '任务名称',
-      value: ref(''),
-      render: (formItem) => {
-        return h(NInput, {
-          value: formItem.value.value,
-          onUpdateValue: (newVal: any) => {
-            formItem.value.value = newVal
-          }
-        })
-      }
+      ftype: null
     },
     {
       key: 'taskDescription',
       label: '任务描述',
-      value: ref(''),
-      render: (formItem) => {
-        return h(NInput, {
-          value: formItem.value.value,
-          onUpdateValue: (newVal: any) => {
-            formItem.value.value = newVal
-          },
-          maxlength: 50
-        })
-      }
+      ftype: null
     },
     {
       key: 'time',
       label: '执行时间',
-      value: ref(null),
-      typeValue: ref(null),
-      timeValue: ref(null),
       style: {
         width: '100%'
       },
-      render: (formItem) => {
-        return [
-          h(NSelect, {
-            style: { width: '30%', 'margin-right': '1.25rem' },
-            options: [{ label: '每天', value: 'day' }],
-            value: formItem.typeValue.value,
-            onUpdateValue: (val) => {
-              formItem.typeValue.value = val
-              formItem.value.value = formItem.typeValue.value + formItem.timeValue.value
-            }
-          }),
-          h(NTimePicker, {
-            style: { width: '30%' },
-            value: formItem.timeValue.value,
-            format: 'HH:mm',
-            onUpdateValue: (val: any) => {
-              formItem.timeValue.value = val
-              formItem.value.value = formItem.typeValue.value + formItem.timeValue.value
-            }
-          })
-        ]
-      }
+      formItemConfig: {
+        showFeedback: false
+      },
+      value: reactive({
+        type: null,
+        time: null
+      }),
+      grid: [
+        {
+          key: 'type',
+          render: (formItem: FormItem, gridRender: GridRender) =>
+            h(NSelect, {
+              style: { width: '40%' },
+              options: [{ label: '每天', value: 'day' }],
+              value: formItem.value[gridRender.key],
+              onUpdateValue: (val) => {
+                formItem.value[gridRender.key] = val
+                console.log(formItem)
+              }
+            })
+        },
+        {
+          key: 'time',
+          render: (formItem: FormItem, gridRender: GridRender) =>
+            h(NTimePicker, {
+              style: {},
+              value: formItem.value[gridRender.key],
+              valueFormat: 'HH:mm',
+              format: 'HH:mm',
+              clearable: true,
+              onUpdateValue: (val: any) => {
+                formItem.value[gridRender.key] = val
+                console.log(formItem)
+              }
+            })
+        }
+      ]
     },
     {
       label: '设备选择',
@@ -114,25 +107,26 @@ export default function ({ doRefresh, backupModalDialogRef, itemDataFormRef, sel
         ]
       }
     }
-  ] as Array<FormItem>
+  ] as Array<OriginItem | Operation>
+
+  const formOptions = useLoadCommon(commOptions) as Array<FormItem>
   const post = usePost()
   const message = useMessage()
 
-  const submitConfirm = () => {
-    const edit_info = itemDataFormRef?.value?.generatorParams()
+  const submitConfirm = (obj: any) => {
     post({
       url: get_net_config_backupupdate,
-      data: edit_info
+      data: obj
     }).then((res) => {
       // if(res.code===201){
       message.success(res.msg)
-      backupModalDialogRef?.value?.toggle()
+      modalDialogRef?.value?.toggle()
       doRefresh()
       // }
     })
   }
 
-  const selectEquipFormItem = itemFormOptions.find((o: FormItem) => o.key === 'selectEquip')
+  const selectEquipFormItem = formOptions.find((o: FormItem) => o.key === 'selectEquip')
   const checkedDataList = () => {
     return selectEquip.dataList.filter((d) => selectEquipFormItem?.value?.value?.includes(d.name))
   }
@@ -142,7 +136,7 @@ export default function ({ doRefresh, backupModalDialogRef, itemDataFormRef, sel
   }
   return {
     modalDialogConfig,
-    itemFormOptions,
+    formOptions,
     submitConfirm,
     selectEquip,
     checkedDataList,

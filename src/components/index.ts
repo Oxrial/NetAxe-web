@@ -4,6 +4,8 @@ import { App, inject } from 'vue'
 import { StoreType } from '../types/store'
 
 import DataForm from './common/DataForm'
+import CommForm from './common/CommForm'
+import OriginForm from './common/OriginForm'
 import { projectName } from '../setting'
 import { toHump } from '../utils'
 
@@ -27,6 +29,8 @@ export function registerComponents(app: App) {
     app.component(component.default.name || toHump(getComponentName(it)), component.default)
   })
   app.component('DataForm', DataForm)
+  app.component('CommForm', CommForm)
+  app.component('OriginForm', OriginForm)
 }
 
 const key = Symbol('layout_store')
