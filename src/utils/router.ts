@@ -11,12 +11,13 @@ import { isExternal, mapTwoLevelRouter, toHump } from '.'
 import LoadingComponent from '../components/loading/index.vue'
 import { baseAddress, WebRouter, WebPermission } from '@/api/url'
 import { ADMIN_WORK_USER_INFO_KEY, ADMIN_WORK_BUTTON_AUTH, ADMIN_WORK_S_TENANT } from '@/store/keys'
-import { cloneDeep } from 'lodash-es'
+import { camelCase, cloneDeep, upperFirst } from 'lodash-es'
 
 interface OriginRoute {
   key: any
   name: string
   web_path: string
+  sort: number
   link_path?: string
   hidden?: boolean
   affix?: boolean
@@ -59,7 +60,6 @@ function getPermission() {
     localStorage.setItem(ADMIN_WORK_BUTTON_AUTH, JSON.stringify(res.results))
   })
 }
-
 function getComponent(it: OriginRoute) {
   // 异步导入
   const component = defineAsyncComponent({
@@ -85,37 +85,39 @@ function isMenu(path: string) {
 
 function getNameByUrl(path: string) {
   const temp = path.split('/')
-  return toHump(temp[temp.length - 2]) + toHump(temp[temp.length - 1])
+  return upperFirst(camelCase(toHump(temp[temp.length - 2]) + toHump(temp[temp.length - 1])))
 }
 
 function generatorRoutes(res: Array<OriginRoute>, prePath = '') {
   const tempRoutes: Array<RouteRecordRawWithHidden> = []
-  res.forEach((it) => {
-    if (!it.key) {
-      // 判断path是否为网址，否则为组件路由
-      const truePath = prePath ? it.web_path.replace(new RegExp(prePath + '/'), '') : it.web_path
-      const path = it.link_path && isExternal(it.link_path) ? it.link_path : truePath
-      const route: RouteRecordRawWithHidden = {
-        path: path,
-        name: getNameByUrl(it.web_path),
-        hidden: !!it.hidden,
-        // 是否为根菜单，是为公共布局组件，否为局部组件
-        component: it.web_path && isMenu(it.web_path) ? Layout : getComponent(it),
-        meta: {
-          title: it.name,
-          affix: !!it.affix,
-          cacheable: !!it.cacheable,
-          icon: it.icon || 'menu',
-          iconPrefix: it.iconPrefix || 'iconfont'
+  res
+    .sort((a, b) => a.sort - b.sort)
+    .forEach((it) => {
+      if (!it.key) {
+        // 判断path是否为网址，否则为组件路由
+        const truePath = prePath ? it.web_path.replace(new RegExp(prePath + '/'), '') : it.web_path
+        const path = it.link_path && isExternal(it.link_path) ? it.link_path : truePath
+        const route: RouteRecordRawWithHidden = {
+          path: path,
+          name: getNameByUrl(it.web_path),
+          hidden: !!it.hidden,
+          // 是否为根菜单，是为公共布局组件，否为局部组件
+          component: it.web_path && isMenu(it.web_path) ? Layout : getComponent(it),
+          meta: {
+            title: it.name,
+            affix: !!it.affix,
+            cacheable: !!it.cacheable,
+            icon: it.icon || 'menu',
+            iconPrefix: it.iconPrefix || 'iconfont'
+          }
         }
+        if (it.children) {
+          const childrenRoute = generatorRoutes(it.children, it.web_path)
+          route.children = childrenRoute
+        }
+        tempRoutes.push(route)
       }
-      if (it.children) {
-        const childrenRoute = generatorRoutes(it.children, it.web_path)
-        route.children = childrenRoute
-      }
-      tempRoutes.push(route)
-    }
-  })
+    })
   return tempRoutes
 }
 

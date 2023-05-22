@@ -67,7 +67,7 @@ import { tablePrefix } from '@/utils'
 import { useTable, useTableColumn } from '@/hooks/table'
 import { useGet } from '@/hooks/useApi'
 import { get_net_equipList } from '@/api/url'
-import { RestartAltTwotone, AddCircleOutlineRound } from '@vicons/material'
+import { RestartAltTwotone, AddCircleOutlineRound, CloudSyncOutlined } from '@vicons/material'
 
 const commOptions = [
   {
@@ -107,6 +107,17 @@ const commOptions = [
             }
           },
           { icon: () => h(NIcon, {}, () => h(AddCircleOutlineRound)), default: () => h('span', '增加设备') }
+        ),
+        h(
+          NButton,
+          {
+            type: 'info',
+            size: 'small',
+            onClick: () => {
+              message.info('CMDB SYNC')
+            }
+          },
+          { icon: () => h(NIcon, {}, () => h(CloudSyncOutlined)), default: () => h('span', 'CMDB同步') }
         )
       ])
   }

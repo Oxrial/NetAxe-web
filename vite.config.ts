@@ -28,7 +28,8 @@ export default ({ mode }) => {
       vueJsx(),
       viteMockServe({
         mockPath: 'mock',
-        watchFiles: false
+        watchFiles: false,
+        logger: true
       }),
       AutoImport({
         imports: 'vue',
@@ -43,6 +44,10 @@ export default ({ mode }) => {
           replacement: path.resolve(process.cwd(), 'src') + '/'
         }
       ]
+    },
+    build: {
+      outDir: './dist/netaxe/web',
+      assetsDir: 'static'
     },
     server: {
       open: true,

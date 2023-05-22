@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import LayoutStore from './components/index'
 import './styles/index.css'
+import './styles/custom.scss'
 import './icons/iconfont/iconfont.css'
 import router from './router'
 import 'vfonts/Lato.css'
@@ -45,3 +46,8 @@ app.use(router)
 router.isReady().then(() => {
   app.mount('#app')
 })
+if (process.env.NODE_ENV === 'production') {
+  import('./mockProdServer').then(({ setupProdMockServer }) => {
+    setupProdMockServer()
+  })
+}

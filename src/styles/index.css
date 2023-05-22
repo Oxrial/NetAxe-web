@@ -21,11 +21,3 @@ td .n-button + .n-button {
 .n-card {
   border-radius: 10px;
 }
-
-.n-form {
-  .n-form-item{ 
-    .n-form-item-label{
-      --n-label-text-align: right
-    }
-  }
-}

@@ -61,8 +61,8 @@
           size="small"
           style="height: calc(100% - 12rem); width: 80%; margin: 0 auto"
           :row-key="selectEquip.rowKey"
-          v-model:checked-row-keys="dataForm.checkedSelectEquipRowKeys.value"
-          @update:checked-row-keys="dataForm.updateCheckedSelectEquipRowKeys"
+          v-model:checked-row-keys="dataForm.checkedRowKeys.value"
+          @update:checked-row-keys="dataForm.updateCheckedRowKeys"
           flex-height
         />
       </template>
@@ -89,7 +89,7 @@
           </n-grid-item>
           <n-grid-item span="3">
             <n-card style="height: 100%">
-              <DataForm
+              <CommForm
                 ref="equipSearchFormRef"
                 :form-config="{
                   labelWidth: 80,

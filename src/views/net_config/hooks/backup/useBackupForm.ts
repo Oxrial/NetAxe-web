@@ -47,12 +47,10 @@ export default function ({ doRefresh, modalDialogRef, dataFormRef, selectEquipMo
           key: 'type',
           render: (formItem: FormItem, gridRender: GridRender) =>
             h(NSelect, {
-              style: { width: '40%' },
               options: [{ label: '每天', value: 'day' }],
               value: formItem.value[gridRender.key],
               onUpdateValue: (val) => {
                 formItem.value[gridRender.key] = val
-                console.log(formItem)
               }
             })
         },
@@ -60,14 +58,12 @@ export default function ({ doRefresh, modalDialogRef, dataFormRef, selectEquipMo
           key: 'time',
           render: (formItem: FormItem, gridRender: GridRender) =>
             h(NTimePicker, {
-              style: {},
-              value: formItem.value[gridRender.key],
               valueFormat: 'HH:mm',
               format: 'HH:mm',
+              formattedValue: formItem.value[gridRender.key],
               clearable: true,
-              onUpdateValue: (val: any) => {
+              onUpdateFormattedValue: (val: any) => {
                 formItem.value[gridRender.key] = val
-                console.log(formItem)
               }
             })
         }
@@ -98,8 +94,8 @@ export default function ({ doRefresh, modalDialogRef, dataFormRef, selectEquipMo
             NButton,
             {
               onClick: () => {
-                remove(selectEquipFormItem?.value?.value, (s) => checkedSelectEquipRowKeys.value.includes(s))
-                arrClear(checkedSelectEquipRowKeys.value)
+                remove(selectEquipFormItem?.value?.value, (s) => checkedRowKeys.value.includes(s))
+                arrClear(checkedRowKeys.value)
               }
             },
             () => h('span', '删除')
@@ -130,9 +126,9 @@ export default function ({ doRefresh, modalDialogRef, dataFormRef, selectEquipMo
   const checkedDataList = () => {
     return selectEquip.dataList.filter((d) => selectEquipFormItem?.value?.value?.includes(d.name))
   }
-  const checkedSelectEquipRowKeys = ref<any[]>([])
-  const updateCheckedSelectEquipRowKeys = (rowKeys: DataTableRowKey[]) => {
-    checkedSelectEquipRowKeys.value = rowKeys
+  const checkedRowKeys = ref<any[]>([])
+  const updateCheckedRowKeys = (rowKeys: DataTableRowKey[]) => {
+    checkedRowKeys.value = rowKeys
   }
   return {
     modalDialogConfig,
@@ -140,7 +136,7 @@ export default function ({ doRefresh, modalDialogRef, dataFormRef, selectEquipMo
     submitConfirm,
     selectEquip,
     checkedDataList,
-    checkedSelectEquipRowKeys,
-    updateCheckedSelectEquipRowKeys
+    checkedRowKeys,
+    updateCheckedRowKeys
   }
 }

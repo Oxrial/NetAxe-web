@@ -132,9 +132,11 @@ export default defineComponent({
         return h(
           NGrid,
           {
-            responsive: 'screen',
-            cols: '2',
-            xGap: 5
+            responsive: it.gridConfig?.responsive || 'self',
+            cols: it.gridConfig?.cols || '4',
+            xGap: it.gridConfig?.xGap || 20,
+            yGap: it.gridConfig?.yGap || 0,
+            itemResponsive: true
           },
           {
             default: () => {

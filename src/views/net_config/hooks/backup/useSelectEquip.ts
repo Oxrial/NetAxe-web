@@ -7,7 +7,7 @@ import { useGet } from '@/hooks/useApi'
 import { get_net_equipList } from '@/api/url'
 import { arrClear } from '@/utils'
 
-export default function ({ itemDataFormRef, selectEquipModalDialogRef }: any) {
+export default function ({ dataFormRef, selectEquipModalDialogRef }: any) {
   const modalDialogConfig = {
     close: () => arrClear(checkedRowKeys.value)
   }
@@ -56,8 +56,7 @@ export default function ({ itemDataFormRef, selectEquipModalDialogRef }: any) {
     })
   }
   const submitConfirm = () => {
-    const selectEquipFormItem = itemDataFormRef?.value.options.find((iform: FormItem) => iform.key === 'selectEquip')
-    console.log(itemDataFormRef, selectEquipFormItem, selectEquipFormItem?.value)
+    const selectEquipFormItem = dataFormRef?.value.options.find((iform: FormItem) => iform.key === 'selectEquip')
     // console.log(selectEquipModalDialogRef)
     selectEquipFormItem!.value!.value = [...checkedRowKeys.value]
     selectEquipModalDialogRef?.value?.toggle()

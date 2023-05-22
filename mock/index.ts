@@ -100,7 +100,7 @@ export default [
     }
   },
   {
-    url: '/api/net_config/confFilesList/',
+    url: '/api/net_config/conf_files_list/',
     method: 'get',
     response: () => {
       return {
@@ -400,7 +400,7 @@ export default [
             id: 20007,
             parent: null,
             icon: null,
-            sort: 7,
+            sort: 8,
             name: '网络配置备份',
             is_link: false,
             is_catalog: false,
@@ -449,7 +449,7 @@ export default [
             id: 20008,
             parent: null,
             icon: null,
-            sort: 8,
+            sort: 7,
             name: '网络设备管理',
             is_link: false,
             is_catalog: false,
@@ -482,8 +482,8 @@ export default [
             id: 20009,
             parent: null,
             icon: null,
-            sort: 9,
-            name: '网络设备管理',
+            sort: 10,
+            name: '网络作业平台',
             is_link: false,
             is_catalog: false,
             web_path: '/net_work',
@@ -508,11 +508,92 @@ export default [
                 visible: true,
                 menuPermission: [],
                 children: null
+              },
+              {
+                id: 20092,
+                parent: 20009,
+                icon: 'Youtube-fill',
+                sort: 2,
+                name: '公网域名切换',
+                is_link: false,
+                is_catalog: false,
+                web_path: '/net_work/domain',
+                component: null,
+                component_name: null,
+                cache: false,
+                visible: true,
+                menuPermission: [],
+                children: null
+              },
+              {
+                id: 20093,
+                parent: 20009,
+                icon: 'Youtube-fill',
+                sort: 3,
+                name: '路由器自动化',
+                is_link: false,
+                is_catalog: false,
+                web_path: '/net_work/router',
+                component: null,
+                component_name: null,
+                cache: false,
+                visible: true,
+                menuPermission: [],
+                children: null
+              },
+              {
+                id: 20094,
+                parent: 20009,
+                icon: 'Youtube-fill',
+                sort: 4,
+                name: '专项流量切换',
+                is_link: false,
+                is_catalog: false,
+                web_path: '/net_work/flow',
+                component: null,
+                component_name: null,
+                cache: false,
+                visible: true,
+                menuPermission: [],
+                children: null
+              }
+            ]
+          },
+          {
+            id: 20010,
+            parent: null,
+            icon: null,
+            sort: 9,
+            name: '合规检查',
+            is_link: false,
+            is_catalog: false,
+            web_path: '/CPL_inspection',
+            component: null,
+            component_name: null,
+            cache: false,
+            visible: true,
+            menuPermission: [],
+            children: [
+              {
+                id: 200101,
+                parent: 20010,
+                icon: 'Youtube-fill',
+                sort: 1,
+                name: '合规检查',
+                is_link: false,
+                is_catalog: false,
+                web_path: '/CPL_inspection/index',
+                component: null,
+                component_name: null,
+                cache: false,
+                visible: true,
+                menuPermission: [],
+                children: null
               }
             ]
           }
         ],
-        count: 9,
+        count: 10,
         page: 1,
         limit: 1
       }

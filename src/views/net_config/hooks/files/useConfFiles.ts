@@ -1,5 +1,5 @@
 import { useTable, useTableColumn } from '@/hooks/table'
-import { DataTableColumn, NIcon, useMessage } from 'naive-ui'
+import { DataTableColumn, NIcon, useMessage, NButton } from 'naive-ui'
 import { useGet } from '@/hooks/useApi'
 import { get_net_conf_files_list } from '@/api/url'
 import { RowData as FileRowData } from '../../files.vue'
@@ -35,14 +35,15 @@ export default function ({ confFilesModalDialogRef }: any) {
         },
         render: (row: RowData) =>
           h(
-            NIcon,
+            NButton,
             {
-              size: '24',
+              type: 'info',
+              size: 'small',
               onClick: () => {
                 console.log(row)
               }
             },
-            () => h(FileDownload)
+            { icon: () => h(NIcon, {}, () => h(FileDownload)), default: () => h('span', '下载') }
           )
       }
     ] as DataTableColumn[],

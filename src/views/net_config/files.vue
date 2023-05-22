@@ -9,8 +9,8 @@
 <template>
   <div class="main-container">
     <n-card>
-      <DataForm
-        ref="filesSearchFormRef"
+      <CommForm
+        ref="searchFormRef"
         :form-config="{
           labelWidth: 'auto',
           style: {
@@ -18,7 +18,8 @@
           }
         }"
         preset="search"
-        :options="filesSearchOptions"
+        :options="formOptions"
+        @submit="onSearch"
       />
       <n-data-table
         :loading="tableLoading"
@@ -71,66 +72,26 @@
 </template>
 
 <script setup lang="ts">
-import { DataFormType, FormItem, Operation, ModalDialogType } from '@/types/components'
-import { DataTableColumn, NInput, NSelect, SelectOption, useMessage, NButton, NIcon, NSpace } from 'naive-ui'
+import { CommFormType, OriginItem, FormItem, Operation, ModalDialogType } from '@/types/components'
+import { DataTableColumn, useMessage, NButton, NIcon, NSpace } from 'naive-ui'
 import { tablePrefix } from '@/utils'
+import { useLoadCommon } from '@/utils/CommForm'
 import { useTable, useTableColumn } from '@/hooks/table'
 import { useGet } from '@/hooks/useApi'
 import { get_net_filesList } from '@/api/url'
 import { RestartAltTwotone } from '@vicons/material'
 
-const filesSearchOptions: Array<FormItem | Operation> = [
+const commOptions = [
   {
-    key: 'column',
-    label: '',
-    value: ref(null),
-    formItemConfig: {
-      labeWidth: '10px'
-    },
-    style: {
-      minWidth: 'unset'
-    },
-    reset: (formItem: FormItem) => (formItem.value.value = null),
-    optionItems: [
-      {
-        label: '名称',
-        value: 'name'
-      },
-      {
-        label: 'IP地址',
-        value: 'ip'
+    key: 'name',
+    label: '设备名称',
+    ftype: null,
+    attrs: {
+      onKeyup: (Event: any) => {
+        if (Event.key == 'Enter') {
+          searchFormRef.value?.submit()
+        }
       }
-    ],
-    render: (formItem: FormItem) => {
-      return h(NSelect, {
-        style: { width: '7.5rem' },
-        value: formItem.value.value,
-        clearable: true,
-        options: formItem.optionItems as Array<SelectOption>,
-        placeholder: '过滤条件',
-        onUpdateValue: (val) => {
-          formItem.value.value = val
-        }
-      })
-    }
-  },
-  {
-    key: 'filterValue',
-    label: '',
-    value: ref(''),
-    render: (formItem: FormItem) => {
-      return h(NInput, {
-        value: formItem.value.value,
-        clearable: true,
-        onUpdateValue: (val) => {
-          formItem.value.value = val
-        },
-        onKeyup: (Event) => {
-          if (Event.key == 'Enter') {
-            onSearch()
-          }
-        }
-      })
     }
   },
   {
@@ -142,15 +103,17 @@ const filesSearchOptions: Array<FormItem | Operation> = [
             type: 'success',
             size: 'small',
             onClick: () => {
-              onResetSearch()
-              onSearch()
+              searchFormRef.value?.reset()
+              searchFormRef.value?.submit()
             }
           },
           { icon: () => h(NIcon, {}, () => h(RestartAltTwotone)), default: () => h('span', '重置') }
         )
       ])
   }
-]
+] as Array<OriginItem | Operation>
+const formOptions = useLoadCommon(commOptions) as Array<FormItem>
+
 const get = useGet()
 const message = useMessage()
 
@@ -159,6 +122,7 @@ const doRefresh = () => {
     url: get_net_filesList,
     data: () => {
       return {
+        ...submitSearchData,
         _: Date.now()
       }
     }
@@ -167,13 +131,13 @@ const doRefresh = () => {
     table.handleSuccess(res)
   })
 }
-const onSearch = () => {
+
+let submitSearchData: object | null = null
+const onSearch = (obj: any) => {
+  submitSearchData = obj
   doRefresh()
 }
-const filesSearchFormRef = ref<DataFormType | null>(null)
-const onResetSearch = () => {
-  filesSearchFormRef.value?.reset()
-}
+const searchFormRef = ref<CommFormType | null>(null)
 export interface RowData {
   name: string
   ip: string
@@ -231,7 +195,7 @@ const tableColumns = useTableColumn(
     align: 'center'
   } as DataTableColumn
 )
-onMounted(onSearch)
+onMounted(() => searchFormRef.value?.submit())
 const confFilesModalDialogRef = ref<ModalDialogType | null>(null)
 import useConfFiles from './hooks/files/useConfFiles'
 const confFiles = useConfFiles({ confFilesModalDialogRef })
