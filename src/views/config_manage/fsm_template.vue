@@ -133,7 +133,7 @@
 
 <script lang="ts">
   import { defineComponent, h, nextTick, onMounted, ref } from 'vue'
-  import _ from 'lodash'
+  import _ from 'lodash-es'
   import { fsm_parse } from '@/api/url'
   import { TreeOption } from 'naive-ui'
   import { FormInst, useMessage } from 'naive-ui'

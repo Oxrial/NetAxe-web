@@ -107,7 +107,7 @@
 </template>
 <script setup lang="ts">
   import { ref, onMounted, h, nextTick } from 'vue'
-  import _ from 'lodash'
+  import _ from 'lodash-es'
   import {
     NTag,
     NButton,

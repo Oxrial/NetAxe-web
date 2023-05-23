@@ -160,7 +160,7 @@
     usePagination,
   } from '@/hooks/table'
   import { defineComponent, h, nextTick, onMounted, reactive, ref, shallowReactive } from 'vue'
-  import _ from 'lodash'
+  import _ from 'lodash-es'
   import {
     DataTableColumn,
     NInput,

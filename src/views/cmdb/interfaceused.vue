@@ -55,7 +55,7 @@
 import { getInterfaceUsedList, getCmdbIdcList, getCmdbRoleList, getVendorList, getCategoryList } from '@/api/url'
 import { useTable, useTableColumn, usePagination } from '@/hooks/table'
 import { defineComponent, h, nextTick, onMounted, reactive, ref, shallowReactive } from 'vue'
-import _ from 'lodash'
+import _ from 'lodash-es'
 import { DataTableColumn, NInput, useDialog, useMessage, NDatePicker } from 'naive-ui'
 import { DataFormType, ModalDialogType, FormItem, TablePropsType } from '@/types/components'
 import useGet from '@/hooks/useGet'

@@ -9,6 +9,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
 import { viteMockServe } from 'vite-plugin-mock'
 import setupExtend from 'vite-plugin-vue-setup-extend'
+import legacy from '@vitejs/plugin-legacy'
 
 export default ({ mode }) => {
   const env = loadEnv(mode, './')
@@ -24,6 +25,9 @@ export default ({ mode }) => {
       }),
       ViteComponents({
         resolvers: [NaiveUiResolver()]
+      }),
+      legacy({
+        targets: ['defaults', 'not IE 11']
       }),
       vueJsx(),
       viteMockServe({
@@ -100,7 +104,7 @@ export default ({ mode }) => {
   } else {
     return Object.assign(
       {
-        base: '/'
+        base: './'
       },
       config
     )

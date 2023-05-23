@@ -131,7 +131,7 @@
 
 <script lang="ts">
   import { defineComponent, h, nextTick, onMounted, ref } from 'vue'
-  import _ from 'lodash'
+  import _ from 'lodash-es'
   import { get_git_config_tree } from '@/api/url'
   import { TreeOption } from 'naive-ui'
   import { CodeDiff } from 'v-code-diff'

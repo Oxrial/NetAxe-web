@@ -81,7 +81,7 @@
 <script lang="ts">
 import { getdispach } from '@/api/url'
 import { TableActionModel, useTable, useRenderAction, useTableColumn, usePagination } from '@/hooks/table'
-import _ from 'lodash'
+import _ from 'lodash-es'
 import { DataTableColumn, NInput, NSelect, SelectOption, useDialog, useMessage, NButton } from 'naive-ui'
 import { DataFormType, ModalDialogType, FormItem, TablePropsType } from '@/types/components'
 import usePost from '@/hooks/usePost'

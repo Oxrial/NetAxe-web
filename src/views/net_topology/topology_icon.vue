@@ -103,7 +103,7 @@
 <script setup lang="ts">
   import { ArchiveOutline as ArchiveIcon } from '@vicons/ionicons5'
   import { h, nextTick, onMounted, ref } from 'vue'
-  import _ from 'lodash'
+  import _ from 'lodash-es'
   import { topology_icon, topology_media_img } from '@/api/url'
   import { TreeOption } from 'naive-ui'
   import { FormInst, useMessage, UploadCustomRequestOptions } from 'naive-ui'

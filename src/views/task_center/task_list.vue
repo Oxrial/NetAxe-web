@@ -82,7 +82,7 @@
 import { getperiodic_taskList, jobcenterTaskUrl, getdispach, getinterval_schedule } from '@/api/url'
 import { TableActionModel, useTable, useRenderAction, useTableColumn, usePagination } from '@/hooks/table'
 import { defineComponent, h, nextTick, onMounted, reactive, ref, shallowReactive } from 'vue'
-import _ from 'lodash'
+import _ from 'lodash-es'
 import { DataTableColumn, NInput, NSelect, SelectOption, useDialog, useMessage, NButton, NPopconfirm, NDatePicker } from 'naive-ui'
 import { DataFormType, ModalDialogType, FormItem, TablePropsType } from '@/types/components'
 import usePost from '@/hooks/usePost'

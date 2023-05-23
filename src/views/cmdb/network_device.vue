@@ -221,7 +221,7 @@ import {
 } from '@/api/url'
 import { useTable, usePagination, useTableColumn } from '@/hooks/table'
 import { computed, defineComponent, h, nextTick, onMounted, reactive, ref, shallowReactive } from 'vue'
-import _ from 'lodash'
+import _ from 'lodash-es'
 import * as XLSX from 'xlsx'
 import { DataTableColumn, NInput, NSelect, NButton, NForm, NFormItem, SelectOption, useDialog, useMessage, NInputGroup, NDataTable } from 'naive-ui'
 import { DataFormType, ModalDialogType, FormItem, TablePropsType } from '@/types/components'
